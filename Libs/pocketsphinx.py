@@ -9,16 +9,16 @@ os.chdir(Root)
 modeldir = "..\\Model"
 datadir = "..\\Datasets\\TestSet"
 
-def freetext():
-    config = lm()
-    stream = open(os.path.join(datadir, "Test.12.wav"), "rb")
-    text = transcribe(config,stream)
-    return  text
+def speechanalytics(type,OOG=1e+1):
+    stream = stream = open(os.path.join(datadir, "Test.12.wav"), "rb")
+    config = detectionconfig(type,OOG)
 
-def keywords(oog):
-    config=kws(oog)
-    stream = stream = open(os.path.join(datadir, "Test.1.wav"), "rb")
-    result = keyword_spotting(config,stream)
+    if type == "kws" or "keyphrase":
+        result = keyword_spotting(config,stream)
+
+    elif type == "lm":
+        result = transcribe(config,stream)
+
     return  result
 
 # Create a decoder with certain model
@@ -28,16 +28,24 @@ def defaultconfig():
     config.set_string('-dict', os.path.join(modeldir, 'en-us/cmudict-en-us.dict'))
     return config
 
-def lm():
+def detectionconfig(type,OOG):
     config = defaultconfig()
-    config.set_string('-lm', os.path.join(modeldir, 'en-us/en-us.lm.bin'))
-    return config
 
-def kws(OOG):
-    config = defaultconfig()
-    config.set_string('-kws', os.path.join(Root, 'kws.txt'))
-    config.set_float('-kws_threshold', OOG)
-    return config
+    if type == "kws":
+        config.set_string('-kws', os.path.join(Root, 'kws.txt'))
+        config.set_float('-kws_threshold', OOG)
+
+        return config
+
+    elif type == "keyphrase":
+        config.set_string('-keyphrase', os.path.join(Root, 'keyphrase.txt'))
+        config.set_float('-kws_threshold', OOG)
+        return config
+
+    elif type == "lm":
+        config = defaultconfig()
+        config.set_string('-lm', os.path.join(modeldir, 'en-us/en-us.lm.bin'))
+        return config
 
 def transcribe(config,stream):
     decoder = Decoder(config)
@@ -71,9 +79,10 @@ def keyword_spotting(config,stream):
 
 if __name__ == "__main__":
     results = []
-    kwsOog = [1e+20,1e+19,1e+18,1e+17,1e+16,1e+15,1e+14,1e+14,1e+13,1e+12,1e+11,1e+10,1e+9,1e+8,1e+7,1e+6,1e+5,1e+4,1e+3,1e+2,1e+1]
+    kwsOog = [1e-50,1e-40,1e-30,1e-20,1e-10,1e+1,1e+10,1e+20,1e+30,1e+30,1e+40,1e+50]
+
     for i in kwsOog:
-        result = keywords(i)
+        result = speechanalytics("kws",i)
         results.append(result)
     for i in results:
         print(i)
