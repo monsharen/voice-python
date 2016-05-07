@@ -34,7 +34,7 @@ def calibration(refkeywords,adjustkwsfile,keywordsfile):
         except:
             outfile.write(keyword+"\n")
         else:
-            outfile.write(keyword + " /" + str(max(oogwords[keyword])) + "/\n" )
+            outfile.write(keyword + "/" + str(max(oogwords[keyword])) + "/\n" )
     outfile.close()
     return hyps
 
@@ -46,4 +46,4 @@ def compare(refs,hyp):
     infile = open(refs, "r")
     refs = [word for word in " ".join(infile.readlines()).split()]
     alignment = align(refs,[word[0] for word in hyp])
-    return alignment['alignment']
+    return alignment
