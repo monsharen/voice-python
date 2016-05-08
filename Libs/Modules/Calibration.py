@@ -2,9 +2,6 @@ __author__ = 'a.ericsson'
 
 import sys, os
 
-#  Root = "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
-#  os.chdir(Root)
-#  sys.path.append(Root+'\\Modules')
 from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
 from Modules.word_align import *
 import numpy as np
