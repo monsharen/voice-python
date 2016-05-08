@@ -21,7 +21,7 @@ if __name__ == "__main__":
     transcription = TrainingSetFolder + "newyork6.txt"
     recording = "newyork6.wav"
     kwsfile = LibsFolder + "\\kwsfile.txt"
-    optkws="optkws.txt"
+    optkws = LibsFolder + "\\optkws.txt"
     refsfile = LibsFolder + "\\refs.txt"
 
     print("Executing pipeline")

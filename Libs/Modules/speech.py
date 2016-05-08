@@ -26,11 +26,11 @@ def defaultconfig():
     return config
 
 
-def detectionconfig(type, OOG,kwsfile):
+def detectionconfig(type, OOG, kwsfile):
     config = defaultconfig()
 
     if type == "kws":
-        config.set_string('-kws', os.path.join(Root, kwsfile))
+        config.set_string('-kws', kwsfile)
         if OOG != None:
             config.set_float('-kws_threshold', OOG)
         return config
