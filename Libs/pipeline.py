@@ -26,3 +26,24 @@ if __name__ == "__main__":
     adjustedhyp = speechanalytics(kwsfile=optkws, audiofile=recording)
 
     results = compare(kwsfile, adjustedhyp)
+
+    print("=== Words ===")
+    print(words)
+    print("=== Keywords ===")
+    print(keywords)
+    print("=== Reference ===")
+    print(refs)
+    print("=== Calibration ===")
+    print(hyps)
+    print("=== Adjusted ===")
+    print(adjustedhyp)
+    print("=== Results ===")
+    print(results)
+
+    insertions = results['Ins']
+    substitutions = results['Subs']
+    deletions = results['Del']
+
+    wordErrorRate = float(insertions + deletions + substitutions) / len(refs) * 100
+    print("=== Word error rate ===")
+    print(wordErrorRate)
