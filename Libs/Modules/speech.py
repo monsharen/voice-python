@@ -41,7 +41,6 @@ def detectionconfig(type, OOG, kwsfile):
         return config
 
     elif type == "lm":
-        config = defaultconfig()
         config.set_string('-lm', os.path.join(modeldir, 'en-us/en-us.lm.bin'))
         return config
 
