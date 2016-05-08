@@ -1,7 +1,6 @@
 import sys
 import os
-
-#  sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+import time
 
 from Modules.Calibration import *
 from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
@@ -9,7 +8,9 @@ from Modules.keywordExtraction import *
 
 if __name__ == "__main__":
 
-    Root = sys.path[0]  # "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
+    processStartedTime = time.time()
+
+    Root = sys.path[0]
     os.chdir(Root)
     sys.path.append(Root + '\\Modules')
 
@@ -18,26 +19,46 @@ if __name__ == "__main__":
     kwsfile = "kwsfile.txt"
     optkws="optkws.txt"
 
+    print("Executing pipeline")
+    print("transcription: " + transcription)
+    print("recording: " + recording)
+    print("kwsfile: " + kwsfile)
+    print("optkws: " + optkws)
+
+    print("Processing words...")
+    subProcessStartedTime = time.time()
     words = extraction(transcription)
-    keywords = randomSampling(words, 5, phones=[4, 6, 8], kws=kwsfile)
-    refs = reference(keyhash=keywords, inputtext=transcription, refsfile="refs.txt")
-
-    hyps = calibration(refkeywords="refs.txt", adjustkwsfile=optkws, keywordsfile=kwsfile, recording=recording)
-    adjustedhyp = speechanalytics(kwsfile=optkws, audiofile=recording)
-
-    results = compare(kwsfile, adjustedhyp)
-
-    print("=== Words ===")
+    print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(words)
-    print("=== Keywords ===")
+
+    print("Processing keywords...")
+    subProcessStartedTime = time.time()
+    keywords = randomSampling(words, 5, phones=[4, 6, 8], kws=kwsfile)
+    print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(keywords)
-    print("=== Reference ===")
+
+    print("Processing reference...")
+    subProcessStartedTime = time.time()
+    refs = reference(keyhash=keywords, inputtext=transcription, refsfile="refs.txt")
+    print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(refs)
-    print("=== Calibration ===")
+
+    print("Processing calibration...")
+    subProcessStartedTime = time.time()
+    hyps = calibration(refkeywords="refs.txt", adjustkwsfile=optkws, keywordsfile=kwsfile, recording=recording)
+    print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(hyps)
-    print("=== Adjusted ===")
+
+    print("Processing speech analytics...")
+    subProcessStartedTime = time.time()
+    adjustedhyp = speechanalytics(kwsfile=optkws, audiofile=recording)
+    print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(adjustedhyp)
-    print("=== Results ===")
+
+    print("Comparing kwsfile and adjustedhyp")
+    subProcessStartedTime = time.time()
+    results = compare(kwsfile, adjustedhyp)
+    print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(results)
 
     insertions = results['Ins']
@@ -45,5 +66,5 @@ if __name__ == "__main__":
     deletions = results['Del']
 
     wordErrorRate = float(insertions + deletions + substitutions) / len(refs) * 100
-    print("=== Word error rate ===")
-    print(wordErrorRate)
+    print("Word error rate:" + str(wordErrorRate))
+    print("Entire process completed in %s seconds" % (time.time() - processStartedTime))
