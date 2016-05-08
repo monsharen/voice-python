@@ -1,14 +1,17 @@
-__author__ = 'a.ericsson'
+import sys
+import os
 
-Root = "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
-import sys,os
-os.chdir(Root)
-sys.path.append(Root+'\\Modules')
-from word_align import *
-from Calibration import *
-from speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
-from keywordExtraction import *
+#  sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+
+from Modules.Calibration import *
+from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
+from Modules.keywordExtraction import *
+
 if __name__ == "__main__":
+
+    Root = sys.path[0]  # "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
+    os.chdir(Root)
+    sys.path.append(Root + '\\Modules')
 
     transcription ="newyork6.txt"
     recording = "newyork6.wav"

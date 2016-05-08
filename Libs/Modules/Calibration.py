@@ -2,11 +2,11 @@ __author__ = 'a.ericsson'
 
 import sys, os
 
-Root = "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
-os.chdir(Root)
-sys.path.append(Root+'\\Modules')
-from speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
-from word_align import *
+#  Root = "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
+#  os.chdir(Root)
+#  sys.path.append(Root+'\\Modules')
+from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
+from Modules.word_align import *
 
 def calibration(refkeywords,adjustkwsfile,keywordsfile,recording):
     """

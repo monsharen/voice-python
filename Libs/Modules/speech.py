@@ -1,16 +1,11 @@
-__author__ = 'a.ericsson'
-__author__ = 'a.ericsson'
-
 import sys, os
-from pocketsphinx.pocketsphinx import *
+from pocketsphinx import *
 from sphinxbase.sphinxbase import *
 
-Root = "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
-os.chdir(Root)
-sys.path.append(Root + '\\Modules')
+Root = os.path.realpath('.')  # "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
 modeldir = "..\\Model"
 datadir = "..\\Datasets\\TrainingSet"
-import word_align
+import Modules.word_align
 
 
 def speechanalytics(audiofile="",type="kws",kwsfile="",OOG=None,**kwargs):
