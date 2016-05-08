@@ -17,8 +17,6 @@ sphinxText = sphinx(audio)
 
 Rank = sentiment_analysis(sentiment_read(sphinxText),sentimentFile)
 
-
-
 def readAudio(audiofile):
     with sr.WavFile(audiofile) as source:
         audio = r.record(source) # read the entire WAV file
