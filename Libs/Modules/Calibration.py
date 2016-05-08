@@ -1,24 +1,24 @@
 __author__ = 'a.ericsson'
 
 import sys, os
-
-from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
+from Modules.speechAnalytics.speech import *
+from Modules.speechAnalytics.Config import *
 from Modules.word_align import *
 import numpy as np
 
-
-def calhelper(parameter,parRange,kwsfile=):
-
+def calhelper(parameter,parRange,keywordsfile,recording,refs):
+    hyps = {}
+    languagemodel, languagedictionary
     for par in parRange:
-        hyp=speechanalytics(kwsfile=keywordsfile, audiofile=recording, optType = { parameter : par } )
+        config = createConfig(kwsfile = keywordsfile, audiofile = recording, optType = {parameter : par })
+        hyp=speechanalytics(config)
         alignment = align(refs,[word[0] for word in hyp])
         hyps[str(par)]=hyp
 
     return hyps
 
-def calibration(refkeywords, keywordsfile, recording, parameter):
+def calibration(refkeywords,config):
 
-    hyps = {}
     infile = open(refkeywords, "r")
     refs = [ word for word in " ".join(infile.readlines()).split()]
 
@@ -42,7 +42,7 @@ def calibration(refkeywords, keywordsfile, recording, parameter):
         parRange = np.logspace(-20,50,15)
         oogwords = { word:[] for word in refs }
 
-        hyps = calhelper(parmeters,parRange)
+        hyps = calhelper(parmeter,parRange)
 
         for (ref, hyp) in alignment['alignment']:
             if ref==hyp:
@@ -58,7 +58,7 @@ def calibration(refkeywords, keywordsfile, recording, parameter):
         outfile.close()
         return hyps
 
-    hyps = calhelper(parameter, parRange)
+    hyps = calhelper(parameter, parRange, keywordsfile, recording,refs)
     return hyps
 
 def compare(refs,hyp):

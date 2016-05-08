@@ -3,7 +3,7 @@ import os
 import time
 
 from Modules.Calibration import *
-from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
+from Modules.speechAnalytics import *
 from Modules.keywordExtraction import *
 
 if __name__ == "__main__":
@@ -17,13 +17,13 @@ if __name__ == "__main__":
     ModelFolder = os.path.realpath('..') + "\\Model\\en-us\\"
     LibsFolder = os.path.realpath('.')
 
+
     dictionaryFile = ModelFolder + "cmudict-en-us.dict"
     transcription = TrainingSetFolder + "newyork6.txt"
     recording = "newyork6.wav"
     kwsfile = LibsFolder + "\\kwsfile.txt"
     optkws = LibsFolder + "\\optkws.txt"
     refsfile = LibsFolder + "\\refs.txt"
-
     print("Executing pipeline")
     print("dictionaryFile: " + dictionaryFile)
     print("transcription: " + transcription)
@@ -52,7 +52,8 @@ if __name__ == "__main__":
 
     print("Processing calibration...")
     subProcessStartedTime = time.time()
-    hyps = calibration(refkeywords="refs.txt", adjustkwsfile=optkws, keywordsfile=kwsfile, recording=recording)
+    config = createConfig(ModelFolder,dictionaryFile,recording,params={kwsfile:kwsfile,kws:"kws",beam})
+    hyps = calibration(refkeywords="refs.txt", keywordsfile=kwsfile, recording=recording,parameter="beam")
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(hyps)
 
