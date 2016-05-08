@@ -28,7 +28,7 @@ def extraction(inputtext, dictionaryFile):
     return words
 
 def randomSampling(words, numwords, phones=[2,4,6,8],kws="kwsfile.txt"):
-    kwsfile = open(Root + "\\Libs\\" + kws, 'w', encoding='utf8')
+    kwsfile = open(kws, 'w', encoding='utf8')
     keywords = []
     for nphone in phones:
         for word in range(0, numwords):

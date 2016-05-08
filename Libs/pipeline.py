@@ -15,11 +15,12 @@ if __name__ == "__main__":
     sys.path.append(Root + '\\Modules')
     TrainingSetFolder = os.path.realpath('..') + "\\Datasets\TrainingSet\\"
     ModelFolder = os.path.realpath('..') + "\\Model\\en-us\\"
+    LibsFolder = os.path.realpath('.')
 
     dictionaryFile = ModelFolder + "cmudict-en-us.dict"
     transcription = TrainingSetFolder + "newyork6.txt"
     recording = "newyork6.wav"
-    kwsfile = "kwsfile.txt"
+    kwsfile = LibsFolder + "\\kwsfile.txt"
     optkws="optkws.txt"
 
     print("Executing pipeline")
