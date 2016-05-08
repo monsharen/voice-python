@@ -9,11 +9,11 @@ Root = "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\L
 os.chdir(Root)
 sys.path.append(Root + '\\Modules')
 modeldir = "..\\Model"
-datadir = "..\\Datasets\\TestSet"
+datadir = "..\\Datasets\\TrainingSet"
 import word_align
 
 
-def speechanalytics(audiofile="Test.12.wav",type="kws",kwsfile="",OOG=None,**kwargs):
+def speechanalytics(audiofile="",type="kws",kwsfile="",OOG=None,**kwargs):
     stream = stream = open(os.path.join(datadir, audiofile), "rb")
     config = detectionconfig(type, OOG, kwsfile)
     if type == "kws" or "keyphrase":

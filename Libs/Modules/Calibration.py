@@ -8,7 +8,7 @@ sys.path.append(Root+'\\Modules')
 from speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
 from word_align import *
 
-def calibration(refkeywords,adjustkwsfile,keywordsfile):
+def calibration(refkeywords,adjustkwsfile,keywordsfile,recording):
     """
     Takes and inputfile with keywords outputs a keywords file with adjusted Out of Grammat Thresholds
     """
@@ -21,7 +21,7 @@ def calibration(refkeywords,adjustkwsfile,keywordsfile):
     oogwords = { word:[] for word in refs }
 
     for oog in kwsOog:
-        hyp = speechanalytics(OOG=oog,kwsfile=keywordsfile)
+        hyp = speechanalytics(OOG=oog,kwsfile=keywordsfile,audiofile=recording)
 
         alignment = align(refs,[word[0] for word in hyp])
         hyps[str(oog)] = hyp
