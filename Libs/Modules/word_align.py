@@ -74,5 +74,4 @@ def backtrace(refs, hyps, align_matrix, backtrace_matrix):
             j = j - 1
             i = i - 1
 
-            #wer = float(inspen + delpen + substpen) / len(refs) * 100
     return {'alignment':alignment[::-1],'Ins':inspen,'Del':delpen,'Subs':substpen}
