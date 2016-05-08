@@ -8,6 +8,7 @@ from word_align import *
 from Calibration import *
 from speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
 from keywordExtraction import *
+
 if __name__ == "__main__":
 
     transcription ="newyork6.txt"
@@ -16,9 +17,8 @@ if __name__ == "__main__":
     optkws="optkws.txt"
 
     words = extraction(transcription)
-    keywords = randomSampling(words,5, phones = [4,6,8], kws=kwsfile)
-    refs = reference(keywords,transcription)
-
+    keywords = randomSampling (words,5, phones = [4,6,8], kws=kwsfile)
+    refs = reference (keyhash=keywords,textfile=transcription,refsfile="refs.txt")
 
     hyps = calibration(refkeywords="refs.txt",adjustkwsfile=optkws,keywordsfile=kwsfile,recording=recording)
     adjustedhyp = speechanalytics(kwsfile=optkws,audiofile=recording)
