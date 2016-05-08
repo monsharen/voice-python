@@ -1,41 +1,56 @@
-__author__ = 'a.ericsson'
+from pocketsphinx.pocketsphinx import Decoder
 
-os.path.join(modeldir, 'en-us/en-us'
-os.path.join(modeldir, 'en-us/cmudict-en-us.dict')
+class Config:
 
+    languageModel = ''
+    languageDictionary = ''
+    audioFile = ''
+    config = None
+    kwsfile = ''
 
-class config()
-def createConfig(self, languagemodel, languagedictionary, audiofile, params={} ):
+    def __init__(self, languagemodel, languagedictionary, audiofile, kwsfile):
+        self.languageModel = languagemodel
+        self.languageDictionary = languagedictionary
+        self.audioFile = audiofile
+        self.config = Decoder.default_config()
+        self.kwsfile = kwsfile
 
-    config = Decoder.default_config()
-    config.set_string('-hmm', languagemodel)
-    config.set_string('-dict', languagedictionary)
-    stream = open(audiofile, "rb")
+    def update(self, typeParams):
 
-    for i in range(0,len(params)):
-        if list(params.keys())[i] == "oog":
-            config.set_float('-kws_threshold', params['oog'])
+        self.config.set_string('-hmm', self.languageModel)
+        self.config.set_string('-dict', self.languageDictionary)
 
-        elif list(params.keys())[i] == "wip":
-            config.set_float('-wip', params['wip'])
+        for i in range(0, len(typeParams)):
+            if list(typeParams.keys())[i] == "oog":
+                self.config.set_float('-kws_threshold', typeParams['oog'])
 
-        elif list(params.keys())[i] == "beam":
-            config.set_float('-beam', params['beam'])
-            config.set_float('-pbeam', params['beam'])
+            elif list(typeParams.keys())[i] == "wip":
+                self.config.set_float('-wip', typeParams['wip'])
 
-        elif list(params.keys())[i] == "kws-delay":
-            config.set_float('-kws-delay', params['kws-delay'])
+            elif list(typeParams.keys())[i] == "beam":
+                self.config.set_float('-beam', typeParams['beam'])
+                self.config.set_float('-pbeam', typeParams['beam'])
 
-        elif list(params.keys())[i] == "wbeam":
-            config.set_float('-wbeam', params['wbeam'])
+            elif list(typeParams.keys())[i] == "kws-delay":
+                self.config.set_float('-kws-delay', typeParams['kws-delay'])
 
-        elif list(params.keys())[i] == "kws":
-            config.set_string('-kws', params['kws'])
+            elif list(typeParams.keys())[i] == "wbeam":
+                self.config.set_float('-wbeam', typeParams['wbeam'])
 
-        elif list(params.keys())[i] == "kws":
-            config.set_string('-keyphrase', params['kws'])
+            elif list(typeParams.keys())[i] == "kws":
+                self.config.set_string('-kws', self.kwsfile)
 
-        elif list(params.keys())[i] == "lm":
-            config.set_string('-lm',params['lm'])
+            elif list(typeParams.keys())[i] == "keyphrase":
+                self.config.set_string('-keyphrase', typeParams['keyphrase'])
 
-    return config
+            elif list(typeParams.keys())[i] == "lm":
+                self.config.set_string('-lm', typeParams['lm'])
+
+    def getSphinxConfig(self):
+        return self.config
+
+    def get_string(self, key):
+        return self.config.get_string(key)
+
+    def getAudioFile(self):
+        return self.audioFile

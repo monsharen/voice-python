@@ -3,7 +3,7 @@ import os
 import time
 
 from Modules.Calibration import *
-from Modules.speechAnalytics import *
+from Modules.speechAnalytics.Config import *
 from Modules.keywordExtraction import *
 
 if __name__ == "__main__":
@@ -14,13 +14,14 @@ if __name__ == "__main__":
     os.chdir(Root)
     sys.path.append(Root + '\\Modules')
     TrainingSetFolder = os.path.realpath('..') + "\\Datasets\TrainingSet\\"
-    ModelFolder = os.path.realpath('..') + "\\Model\\en-us\\"
+    ModelFolder = os.path.realpath('..') + "\\Model\\en-us"
     LibsFolder = os.path.realpath('.')
 
 
-    dictionaryFile = ModelFolder + "cmudict-en-us.dict"
+    dictionaryFile = ModelFolder + "\\cmudict-en-us.dict"
+    acousticModel = ModelFolder + "\\en-us"
     transcription = TrainingSetFolder + "newyork6.txt"
-    recording = "newyork6.wav"
+    recording = TrainingSetFolder + "newyork6.wav"
     kwsfile = LibsFolder + "\\kwsfile.txt"
     optkws = LibsFolder + "\\optkws.txt"
     refsfile = LibsFolder + "\\refs.txt"
@@ -52,14 +53,15 @@ if __name__ == "__main__":
 
     print("Processing calibration...")
     subProcessStartedTime = time.time()
-    config = createConfig(ModelFolder,dictionaryFile,recording,params={kwsfile:kwsfile,kws:"kws",beam})
-    hyps = calibration(refkeywords="refs.txt", keywordsfile=kwsfile, recording=recording,parameter="beam")
+    config = Config(acousticModel, dictionaryFile, recording, kwsfile)
+    alignments, hyps = calibration(refkeywords=refsfile, config=config, parameter='beam')
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(hyps)
+    print(alignments)
 
     print("Processing speech analytics...")
     subProcessStartedTime = time.time()
-    adjustedhyp = speechanalytics(kwsfile=optkws, audiofile=recording)
+    adjustedhyp = speechanalytics(config)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(adjustedhyp)
 

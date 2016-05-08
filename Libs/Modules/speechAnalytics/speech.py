@@ -14,8 +14,12 @@ def speechanalytics(config):
 
     lm = config.get_string('-lm')
 
-    if (kws == "kws") or (keyphrase == "keyphrase"):
-        result = keyword_spotting(config, stream, OOG)
+    stream = open(config.getAudioFile(), "rb")
+
+    result = ''
+    if (kws != None) or (keyphrase == "keyphrase"):
+        print("kws: " + str(kws) + ", lm: " + str(lm))
+        result = keyword_spotting(config, stream)
 
     elif lm == "lm":
         result = transcribe(config, stream)
@@ -23,7 +27,7 @@ def speechanalytics(config):
     return result
 
 def transcribe(config, stream):
-    decoder = Decoder(config)
+    decoder = Decoder(config.getSphinxConfig())
     decoder.start_utt()
     while True:
         buf = stream.read(1024)
@@ -36,9 +40,9 @@ def transcribe(config, stream):
     return hypothesis.hypstr
 
 
-def keyword_spotting(config, stream, OOG,threshold=20):
+def keyword_spotting(config, stream,threshold=20):
     result = []
-    decoder = Decoder(config)
+    decoder = Decoder(config.getSphinxConfig())
     decoder.start_utt()
 
     while True:
