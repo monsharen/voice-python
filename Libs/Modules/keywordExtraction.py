@@ -2,11 +2,6 @@
 __author__ = 'a.ericsson'
 
 import os,sys
-
-Root = os.path.realpath('..')  # "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python"
-os.chdir(Root)
-sys.path.append(Root+'\\Libs\\Modules')
-
 from random import randint,choice
 
 
@@ -41,7 +36,7 @@ def randomSampling(words, numwords, phones=[2,4,6,8],kws="kwsfile.txt"):
 
 def reference(keyhash=None,inputtext="",refsfile=""):
     textfile = open(inputtext, "r", encoding='utf8')
-    outputfile = open(Root + "\\Libs\\" + refsfile, 'w', encoding='utf8')
+    outputfile = open(refsfile, 'w', encoding='utf8')
     refs = []
     for w in " ".join(textfile.readlines()).split():
         word = w.rstrip('.,:;!?').lower()

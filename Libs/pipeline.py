@@ -22,6 +22,7 @@ if __name__ == "__main__":
     recording = "newyork6.wav"
     kwsfile = LibsFolder + "\\kwsfile.txt"
     optkws="optkws.txt"
+    refsfile = LibsFolder + "\\refs.txt"
 
     print("Executing pipeline")
     print("dictionaryFile: " + dictionaryFile)
@@ -44,7 +45,7 @@ if __name__ == "__main__":
 
     print("Processing reference...")
     subProcessStartedTime = time.time()
-    refs = reference(keyhash=keywords, inputtext=transcription, refsfile="refs.txt")
+    refs = reference(keyhash=keywords, inputtext=transcription, refsfile=refsfile)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(refs)
 
