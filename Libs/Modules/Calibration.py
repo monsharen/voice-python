@@ -6,44 +6,59 @@ from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, spe
 from Modules.word_align import *
 import numpy as np
 
-def calibration(refkeywords,adjustkwsfile,keywordsfile,recording):
-    """
-    Takes and inputfile with keywords outputs a keywords file with adjusted Out of Grammat Thresholds
-    """
 
+def calhelper(parameter,parRange,kwsfile=):
 
-    kwsOog = np.logspace(-20,50,15)
-    beam  = np.logspace(-80,-40,5)
-    wbeam =np.logspace(-30,-5,6)
-    kwsdelay = np.arange(10,0,-1)
-    lw = np.arange(0,5.5,0.5)
-    wip = np.arange(0.0,0.5,0.05)
+    for par in parRange:
+        hyp=speechanalytics(kwsfile=keywordsfile, audiofile=recording, optType = { parameter : par } )
+        alignment = align(refs,[word[0] for word in hyp])
+        hyps[str(par)]=hyp
 
+    return hyps
 
-
+def calibration(refkeywords, keywordsfile, recording, parameter):
 
     hyps = {}
     infile = open(refkeywords, "r")
-    outfile = open(adjustkwsfile,"w")
     refs = [ word for word in " ".join(infile.readlines()).split()]
-    oogwords = { word:[] for word in refs }
 
-    for oog in kwsOog:
-        hyp = speechanalytics(OOG=oog,kwsfile=keywordsfile,audiofile=recording)
+    if parameter == "beam":
+        parRange = np.logspace(-80,-40,5)
 
-        alignment = align(refs,[word[0] for word in hyp])
-        hyps[str(oog)] = hyp
+    elif parameter == "kws-delay":
+        parRange = np.arange(10,0,-1)
+
+    elif parameter == "wip":
+        parRange = np.arange(0.0,0.5,0.05)
+
+    elif parameter == "lw":
+        parRange = np.arange(0,5.5,0.5)
+
+    elif parameter == "wbeam":
+        parRange = np.logspace(-30,-5,6)
+
+    elif parameter == "oog":
+        outfile = open(adjustkwsfile,"w")
+        parRange = np.logspace(-20,50,15)
+        oogwords = { word:[] for word in refs }
+
+        hyps = calhelper(parmeters,parRange)
+
         for (ref, hyp) in alignment['alignment']:
             if ref==hyp:
                 oogwords[ref].append(oog)
 
-    for keyword in oogwords.keys():
-        try: max(oogwords[keyword])
-        except:
-            outfile.write(keyword+"\n")
-        else:
-            outfile.write(keyword + "/" + str(max(oogwords[keyword])) + "/\n" )
-    outfile.close()
+        for keyword in oogwords.keys():
+            try: max(oogwords[keyword])
+            except:
+                outfile.write(keyword+"\n")
+            else:
+                outfile.write(keyword + "/" + str(max(oogwords[keyword])) + "/\n" )
+
+        outfile.close()
+        return hyps
+
+    hyps = calhelper(parameter, parRange)
     return hyps
 
 def compare(refs,hyp):
