@@ -13,13 +13,17 @@ if __name__ == "__main__":
     Root = sys.path[0]
     os.chdir(Root)
     sys.path.append(Root + '\\Modules')
+    TrainingSetFolder = os.path.realpath('..') + "\\Datasets\TrainingSet\\"
+    ModelFolder = os.path.realpath('..') + "\\Model\\en-us\\"
 
-    transcription ="newyork6.txt"
+    dictionaryFile = ModelFolder + "cmudict-en-us.dict"
+    transcription = TrainingSetFolder + "newyork6.txt"
     recording = "newyork6.wav"
     kwsfile = "kwsfile.txt"
     optkws="optkws.txt"
 
     print("Executing pipeline")
+    print("dictionaryFile: " + dictionaryFile)
     print("transcription: " + transcription)
     print("recording: " + recording)
     print("kwsfile: " + kwsfile)
@@ -27,7 +31,7 @@ if __name__ == "__main__":
 
     print("Processing words...")
     subProcessStartedTime = time.time()
-    words = extraction(transcription)
+    words = extraction(transcription, dictionaryFile)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(words)
 
