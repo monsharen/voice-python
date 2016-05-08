@@ -19,10 +19,10 @@ if __name__ == "__main__":
     optkws="optkws.txt"
 
     words = extraction(transcription)
-    keywords = randomSampling (words,5, phones = [4,6,8], kws=kwsfile)
-    refs = reference (keyhash=keywords,textfile=transcription,refsfile="refs.txt")
+    keywords = randomSampling(words, 5, phones=[4, 6, 8], kws=kwsfile)
+    refs = reference(keyhash=keywords, inputtext=transcription, refsfile="refs.txt")
 
-    hyps = calibration(refkeywords="refs.txt",adjustkwsfile=optkws,keywordsfile=kwsfile,recording=recording)
-    adjustedhyp = speechanalytics(kwsfile=optkws,audiofile=recording)
+    hyps = calibration(refkeywords="refs.txt", adjustkwsfile=optkws, keywordsfile=kwsfile, recording=recording)
+    adjustedhyp = speechanalytics(kwsfile=optkws, audiofile=recording)
 
-    results = compare(kwsfile,adjustedhyp)
+    results = compare(kwsfile, adjustedhyp)
