@@ -24,4 +24,3 @@ if __name__ == "__main__":
     adjustedhyp = speechanalytics(kwsfile=optkws,audiofile=recording)
 
     results = compare(kwsfile,adjustedhyp)
-    
