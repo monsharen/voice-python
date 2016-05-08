@@ -41,7 +41,7 @@ def randomSampling(words, numwords, phones=[2,4,6,8],kws="kwsfile.txt"):
     kwsfile.close()
     return keywords
 
-def reference(keyhash=None,textfile="",refsfile=""):
+def reference(keyhash=None,inputtext="",refsfile=""):
     textfile = open(TrainSet + "\\"+inputtext, "r",encoding='utf8')
     outputfile = open(Root+ "\\Libs\\" + refsfile,'w',encoding='utf8')
     refs = []

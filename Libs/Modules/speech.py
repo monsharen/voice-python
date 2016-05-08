@@ -1,21 +1,15 @@
 import sys, os
-from pocketsphinx import *
+import Modules.word_align
+from pocketsphinx.pocketsphinx import *
 from sphinxbase.sphinxbase import *
 
 Root = os.path.realpath('.')  # "C:\\Users\\a.ericsson\\PycharmProjects\\SpeechAnalytics\\Voice_Python\\Libs"
 modeldir = "..\\Model"
 datadir = "..\\Datasets\\TrainingSet"
-import Modules.word_align
 
-    beam  = np.logspace(-80,-40,5)
-    wbeam =np.logspace(-30,-5,6)
-    kwsdelay = np.arange(10,0,-1)
-    lw = np.arange(0,5.5,0.5)
-    wip = np.arange(0.0,0.5,0.05)
-
-def speechanalytics(audiofile="", type="kws", kwsfile="", OOG=None, wip=None,):
+def speechanalytics(audiofile="", type="kws", kwsfile="", OOG=None):
     stream = stream = open(os.path.join(datadir, audiofile), "rb")
-    config = detectionconfig(type, OOG, kwsfile,WIP=wip,LW=lw,BEAM=beam,WBEAM=wbeam,KWSDELAY=kwsdelay)
+    config = detectionconfig(type, OOG, kwsfile)
     if type == "kws" or "keyphrase":
         result = keyword_spotting(config, stream, OOG)
     elif type == "lm":
