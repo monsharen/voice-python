@@ -30,6 +30,7 @@ if __name__ == "__main__":
     print("recording: " + recording)
     print("kwsfile: " + kwsfile)
     print("optkws: " + optkws)
+    print("refsfile: " + refsfile)
 
     print("Processing words...")
     subProcessStartedTime = time.time()
