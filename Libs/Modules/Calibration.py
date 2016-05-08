@@ -7,14 +7,25 @@ import sys, os
 #  sys.path.append(Root+'\\Modules')
 from Modules.speech import keyword_spotting, detectionconfig, defaultconfig, speechanalytics
 from Modules.word_align import *
+import numpy as np
 
 def calibration(refkeywords,adjustkwsfile,keywordsfile,recording):
     """
     Takes and inputfile with keywords outputs a keywords file with adjusted Out of Grammat Thresholds
     """
 
+
+    kwsOog = np.logspace(-20,50,15)
+    beam  = np.logspace(-80,-40,5)
+    wbeam =np.logspace(-30,-5,6)
+    kwsdelay = np.arange(10,0,-1)
+    lw = np.arange(0,5.5,0.5)
+    wip = np.arange(0.0,0.5,0.05)
+
+
+
+
     hyps = {}
-    kwsOog = [1e-50,1e-40,1e-30,1e-20,1e-10,1e-9,1e-8,1e-7,1e-6,1e-5,1e-4,1e-3,1e-2,1e-1,1e+1,1e+10,1e+20,1e+30,1e+40,1e+50]
     infile = open(refkeywords, "r")
     outfile = open(adjustkwsfile,"w")
     refs = [ word for word in " ".join(infile.readlines()).split()]

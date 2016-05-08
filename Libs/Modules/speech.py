@@ -7,10 +7,15 @@ modeldir = "..\\Model"
 datadir = "..\\Datasets\\TrainingSet"
 import Modules.word_align
 
+    beam  = np.logspace(-80,-40,5)
+    wbeam =np.logspace(-30,-5,6)
+    kwsdelay = np.arange(10,0,-1)
+    lw = np.arange(0,5.5,0.5)
+    wip = np.arange(0.0,0.5,0.05)
 
-def speechanalytics(audiofile="",type="kws",kwsfile="",OOG=None,**kwargs):
+def speechanalytics(audiofile="", type="kws", kwsfile="", OOG=None, wip=None,):
     stream = stream = open(os.path.join(datadir, audiofile), "rb")
-    config = detectionconfig(type, OOG, kwsfile)
+    config = detectionconfig(type, OOG, kwsfile,WIP=wip,LW=lw,BEAM=beam,WBEAM=wbeam,KWSDELAY=kwsdelay)
     if type == "kws" or "keyphrase":
         result = keyword_spotting(config, stream, OOG)
     elif type == "lm":
@@ -60,7 +65,7 @@ def transcribe(config, stream):
     return hypothesis.hypstr
 
 
-def keyword_spotting(config, stream, OOG,threshold=100):
+def keyword_spotting(config, stream, OOG,threshold=20):
     result = []
     decoder = Decoder(config)
     decoder.start_utt()
