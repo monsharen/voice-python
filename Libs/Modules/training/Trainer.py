@@ -3,6 +3,7 @@ import shutil
 import os
 from distutils.dir_util import copy_tree
 
+sampleName = "arctic20"
 sphinxBinPath = "C:\\Users\\monsharen\\Dropbox\\projects\\voice-java\\sphinx\\sphinxtrain\\bin\\Release\\x64"
 sourceFolder = "C:\\Users\\monsharen\\Dropbox\\projects\\voice-java\\sphinx\\en-us"
 sampleRate = 16000
@@ -15,7 +16,7 @@ def get_sphinx_fe_command():
             "sphinx_fe",
             "-argfile", sourceFolder + "en_us\\feat.params",
             "-samprate", str(sampleRate),
-            "-c", sourceFolder + "\\artic20.fileids",
+            "-c", sourceFolder + "\\" + sampleName + ".fileids",
             "-di", inputFolder,
             "-do", outputFolder,
             "-ei", "wav",
@@ -42,8 +43,8 @@ def get_bw_command():
         "-cmn", "current",
         "-agc", "none",
         "-dictfn", inputFolder + "\\en_us\\cmudict-en-us.dict",
-        "-ctlfn", sourceFolder + "\\arctic20.fileids",
-        "-lsnfn", sourceFolder + "\\arctic20.transcription",
+        "-ctlfn", sourceFolder + "\\" + sampleName + ".fileids",
+        "-lsnfn", sourceFolder + "\\" + sampleName + ".transcription",
         "-accumdir", outputFolder,
         "-cepdir", sourceFolder
     ]
