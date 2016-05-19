@@ -1,94 +1,93 @@
 from subprocess import call
 import shutil
 import os
+import sys
 from distutils.dir_util import copy_tree
 
-sampleName = "arctic20"
-sphinxBinPath = "C:\\Users\\monsharen\\Dropbox\\projects\\voice-java\\sphinx\\sphinxtrain\\bin\\Release\\x64"
-sourceFolder = "C:\\Users\\monsharen\\Dropbox\\projects\\voice-java\\sphinx\\en-us"
-sampleRate = 16000
-inputFolder = "C:\\Users\\monsharen\\Dropbox\\projects\\voice-java\\sphinx\\en-us"
-outputFolder = "C:\\Users\\monsharen\\Dropbox\\projects\\voice-java\\sphinx\\en-us"
+current = sys.path[0]
+root = os.path.realpath('..\\..\\..')
+modelFolder = root + "\\Model\\"
 
+
+trainingSet = "The Obama Deception"
+trainingFolder = root + "\\Datasets\\trainingSet\\" + trainingSet
+
+
+def createAdaption():
+    adaptFolder = modelFolder + "\\" + originalModel + "_Adapt_" + trainingSet
+    if os.path.exists(adaptFolder):
+        shutil.rmtree(adaptFolder, ignore_errors=True)
+    os.makedirs(adaptFolder)
+    copy_tree(originalModelFolder,adaptFolder)
+    return adaptFolder
+
+newLanguangeModel = createAdaption() + "\\"
+newAcousticModel = newLanguangeModel + "\\" + originalModel
+outputFolder = trainingFolder
 
 def get_sphinx_fe_command():
-    return ["sphinx_fe", sphinxBinPath,
-            "sphinx_fe",
-            "-argfile", sourceFolder + "en_us\\feat.params",
+    return [sphinxBinPath + "\\sphinx_fe",
+            "-argfile", newAcousticModel + "\\feat.params",
             "-samprate", str(sampleRate),
-            "-c", sourceFolder + "\\" + sampleName + ".fileids",
-            "-di", inputFolder,
+            "-c", trainingFolder + "\\" + trainingSet + ".fileids.txt",
+            "-di", trainingFolder,
             "-do", outputFolder,
             "-ei", "wav",
             "-eo", "mfc",
             "-mswav", "yes"]
 
-
 def get_mdef_convert_command():
     return [
         sphinxBinPath + "\\pocketsphinx_mdef_convert",
-        "-text", inputFolder + "\\en_us\\mdef",
-        inputFolder + "\\en_us\\mdef.txt"
+        "-text", newAcousticModel + "\\mdef",
+        newAcousticModel + "\\mdef.txt"
     ]
-
 
 def get_bw_command():
     return [
         sphinxBinPath + "\\bw",
-        "-hmmdir", sourceFolder + "\\en_us",
-        "-moddeffn", inputFolder + "\\en_us\\mdef.txt",
-        "-ts2cbfn", ".ptm",
-        "-feat", "1s_c_d_dd",
-        "-svspec", "0-12/13-25/26-38",
+        "-hmmdir", newAcousticModel,
+        "-moddeffn", newAcousticModel +"\\mdef.txt",
+        "-ts2cbfn", ".cont.",
+         "-feat", "1s_c_d_dd",
+        #"-svspec", "0-12/13-25/26-38",
+        "-lda", newAcousticModel + "\\feature_transform",
         "-cmn", "current",
         "-agc", "none",
-        "-dictfn", inputFolder + "\\en_us\\cmudict-en-us.dict",
-        "-ctlfn", sourceFolder + "\\" + sampleName + ".fileids",
-        "-lsnfn", sourceFolder + "\\" + sampleName + ".transcription",
-        "-accumdir", outputFolder,
-        "-cepdir", sourceFolder
+        "-dictfn", newLanguangeModel +  "\\cmudict-en-us.dict",
+        "-ctlfn", trainingFolder + "\\" + trainingSet + ".fileids.txt",
+        "-lsnfn", trainingFolder + "\\" + trainingSet + ".transcription.txt",
+        "-accumdir", trainingFolder,
+        "-cepdir", trainingFolder
     ]
-
 
 def get_mllr_solve_command():
     return [
         sphinxBinPath + "\\mllr_solve",
-        "-meanfn", sourceFolder + "\\en_us\\means",
-        "-varfn", sourceFolder + "\\en_us\\variances",
+        "-meanfn", newAcousticModel + "\\means",
+        "-varfn", newAcousticModel + "\\variances",
         "-outmllrfn", "mllr_matrix",
-        "-accumdir", outputFolder
+        "-accumdir", trainingFolder
     ]
-
 
 def get_map_adapt_command():
     return [
         sphinxBinPath + "\\" + "map_adapt",
-        "-moddeffn", sourceFolder + "\\" + "en_us" + "\\" + "mdef.txt",
+        "-moddeffn", newAcousticModel + "\\" + "mdef.txt",
         "-ts2cbfn", ".ptm.",
-        "-meanfn", sourceFolder + "\\" + "en_us" + "\\" + "means",
-        "-varfn", sourceFolder + "\\" + "en_us" + "\\" + "variances",
-        "-mixwfn", sourceFolder + "\\" + "en_us" + "\\" + "mixture_weights",
-        "-tmatfn", sourceFolder + "\\" + "en_us" + "\\" + "transition_matrices",
-        "-accumdir", outputFolder,
-        "-mapmeanfn", sourceFolder + "\\" + "en_us_adapt" + "\\" + "means",
-        "-mapvarfn", sourceFolder + "\\" + "en_us_adapt" + "\\" + "variances",
-        "-mapmixwfn", sourceFolder + "\\" + "en_us_adapt" + "\\" + "mixture_weights",
-        "-maptmatfn", sourceFolder + "\\" + "en_us_adapt" + "\\" + "transition_matrices"
+        "-meanfn", newAcousticModel + "\\means",
+        "-varfn", newAcousticModel + "\\variances",
+        "-mixwfn", newAcousticModel + "\\mixture_weights",
+        "-tmatfn", newAcousticModel+ "\\transition_matrices",
+        "-accumdir", trainingFolder,
+        "-mapmeanfn", newLanguangeModel + "\\final" + "\\means",
+        "-mapvarfn",  newLanguangeModel + "\\final" + "\\variances",
+        "-mapmixwfn", newLanguangeModel + "\\final" + "\\mixture_weights",
+        "-maptmatfn", newLanguangeModel + "\\final" + "\\transition_matrices"
     ]
 
-
-def create_output_folder():
-    languageFolder = sourceFolder + "\\en_us"
-    adaptFolder = sourceFolder + "\\en_us_adapt"
-    if os.path.exists(adaptFolder):
-        shutil.rmtree(adaptFolder, ignore_errors=True)
-    os.makedirs(adaptFolder)
-    copy_tree(languageFolder, adaptFolder)
-
-
-call(get_sphinx_fe_command())
-call(get_mdef_convert_command())
-call(get_bw_command())
-call(get_mllr_solve_command())
-create_output_folder()
-call(get_map_adapt_command())
+def create_newModel():
+    final = newLanguangeModel + "\\final"
+    if os.path.exists(final):
+        shutil.rmtree(final, ignore_errors=True)
+    os.makedirs(final)
