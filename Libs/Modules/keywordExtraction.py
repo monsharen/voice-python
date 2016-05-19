@@ -29,7 +29,7 @@ def randomSampling(words, numwords, phones=[2,4,6,8],kws="kwsfile.txt"):
         for word in range(0, numwords):
             keyword = choice(list(words[str(nphone)].keys()))
             keywords.append(keyword)
-            words[str(nphone)][keyword].pop
+            words[str(nphone)].pop(keyword)
             kwsfile.write(keyword+"\n")
     kwsfile.close()
     return keywords

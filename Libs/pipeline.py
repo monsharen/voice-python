@@ -2,9 +2,11 @@ import sys
 import os
 import time
 
-from Modules.Calibration import *
-from Modules.speechAnalytics.Config import *
+from Modules.calibration import *
+from Modules.speechAnalytics.config import *
 from Modules.keywordExtraction import *
+from Modules.training.filePreparation import *
+from Modules.training.trainer import *
 
 if __name__ == "__main__":
 
@@ -13,18 +15,33 @@ if __name__ == "__main__":
     Root = sys.path[0]
     os.chdir(Root)
     sys.path.append(Root + '\\Modules')
-    TrainingSetFolder = os.path.realpath('..') + "\\Datasets\TrainingSet\\"
-    ModelFolder = os.path.realpath('..') + "\\Model\\en-us"
-    LibsFolder = os.path.realpath('.')
+    libsFolder = os.path.realpath('.')
+    outputFolder = os.path.realpath('..') + "\\Output\\"
 
+    trainingSet = "The Obama Deception"
+    trainingSetFolder = os.path.realpath('..') + "\\Datasets\TrainingSet\\" + trainingSet + "//"
+    modelFolder = os.path.realpath('..') + "\\Model\\en-us"
 
-    dictionaryFile = ModelFolder + "\\cmudict-en-us.dict"
-    acousticModel = ModelFolder + "\\en-us"
-    transcription = TrainingSetFolder + "newyork6.txt"
-    recording = TrainingSetFolder + "newyork6.wav"
-    kwsfile = LibsFolder + "\\kwsfile.txt"
-    optkws = LibsFolder + "\\optkws.txt"
-    refsfile = LibsFolder + "\\refs.txt"
+##  Trainingset File Preparation
+    fileidsFile = open(trainingSetFolder + "fileids.txt","w")
+    transcriptionFile = open(trainingSetFolder+"transcription.txt","w")
+    origAudioFile = wave.open(trainingSetFolder + 'The_Obama_Deception_HQ_Full_length_version.wav','r')
+    subsFile = trainingSetFolder + "The Obama Deception [English subtitles v7].srt"
+
+##  Training Model
+    sampleRate = 8000
+    originalModel = "cmusphinx-en-us-ptm-8khz-5.2"
+    originalModelFolder = modelFolder  + originalModel
+    sphinxBinPath = root + "\\SphinxTrain\\bin\\Release\\x64"
+##
+    dictionaryFile = modelFolder + "\\cmudict-en-us.dict"
+    acousticModel = modelFolder + "\\en-us"
+    transcription = trainingSetFolder + "Test.12.txt"
+    recording = trainingSetFolder + "Test.12.wav"
+    kwsfile = outputFolder + "kwsfile.txt"
+    optkws = outputFolder + "\\optkws.txt"
+    refsfile = outputFolder +  "\\refs.txt"
+
     print("Executing pipeline")
     print("dictionaryFile: " + dictionaryFile)
     print("transcription: " + transcription)
@@ -32,6 +49,28 @@ if __name__ == "__main__":
     print("kwsfile: " + kwsfile)
     print("optkws: " + optkws)
     print("refsfile: " + refsfile)
+
+    print("Generating TrainingFiles...")
+    subArray = subsGeneration(subsFile)
+
+    for (index,value) in enumerate(subArray):
+        start,end,text = value
+        fileid = trainingSet + "_"+ str(index)
+        generateAudioFiles(origAudioFile,start,end,fileid)
+        generateTranscription(text,fileid)
+        generateFileIds(fileid)
+    fileidsFile.close()
+    transcriptionFile.close()
+
+    print("Training Model...")
+    print(get_sphinx_fe_command())
+    call(get_sphinx_fe_command())
+    call(get_mdef_convert_command())
+    call(get_bw_command())
+    call(get_mllr_solve_command())
+    create_newModel()
+    call(get_map_adapt_command())
+
 
     print("Processing words...")
     subProcessStartedTime = time.time()
@@ -41,7 +80,9 @@ if __name__ == "__main__":
 
     print("Processing keywords...")
     subProcessStartedTime = time.time()
-    keywords = randomSampling(words, 5, phones=[4, 6, 8], kws=kwsfile)
+    keywords = randomSampling(words, 5, phones=[6], kws=kwsfile)
+    kws = open(kwsfile,'rb')
+    #keywords = [ word for word in " ".join(kws.readlines()).split() ]
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(keywords)
 
@@ -54,7 +95,7 @@ if __name__ == "__main__":
     print("Processing calibration...")
     subProcessStartedTime = time.time()
     config = Config(acousticModel, dictionaryFile, recording, kwsfile)
-    alignments, hyps = calibration(refkeywords=refsfile, config=config, parameter='beam')
+    alignments, hyps = calibration(refkeywords=refsfile, config=config, parameter='oog',optkws=optkws)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(hyps)
     print(alignments)
