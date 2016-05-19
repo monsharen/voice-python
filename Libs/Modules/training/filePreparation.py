@@ -5,12 +5,16 @@ from Modules.training.trainingFilesUtil import *
 if __name__ == "__main__":
 
     #  Trainingset File Preparation config
+    #  Input
     trainingSet = "The Obama Deception"
-    trainingSetFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
-    fileIdsInputFile = trainingSetFolder + "fileids.txt"
-    transcriptionInputFile = trainingSetFolder + "transcription.txt"
-    originalAudioFile = trainingSetFolder + 'The_Obama_Deception_HQ_Full_length_version.wav'
-    subsFile = trainingSetFolder + "The Obama Deception [English subtitles v7].srt"
+    inputFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
+    originalAudioFile = inputFolder + 'The_Obama_Deception_HQ_Full_length_version.wav'
+    subsFile = inputFolder + "The Obama Deception [English subtitles v7].srt"
+
+    #  Output
+    outputFolder = inputFolder
+    fileIdsInputFile = outputFolder + "fileids.txt"
+    transcriptionInputFile = outputFolder + "transcription.txt"
     #  End config
 
     print("Parsing subs from file '" + subsFile + "'...")
@@ -29,13 +33,13 @@ if __name__ == "__main__":
     for (index, value) in enumerate(subArray):
         start, end, text = value
         fileid = trainingSet + "_" + str(index)
-        print("creating audio file '" + trainingSetFolder + fileid + ".wav'...")
-        generateAudioFiles(trainingSetFolder, origAudioFile, start, end, fileid)
+        generateAudioFiles(outputFolder, origAudioFile, start, end, fileid)
         generateTranscription(transcriptionFile, text, fileid)
         generateFileIds(fileIdsFile, fileid)
     fileIdsFile.close()
     transcriptionFile.close()
     print("Done")
+    print("Output folder: " + outputFolder)
 
 
 
