@@ -1,31 +1,37 @@
 from subprocess import call
 import shutil
 import os
-import sys
 from distutils.dir_util import copy_tree
 
-current = sys.path[0]
-root = os.path.realpath('..\\..\\..')
-modelFolder = root + "\\Model\\"
+
+# current = sys.path[0]
+# root = os.path.realpath('..\\..\\..')
 
 
-trainingSet = "The Obama Deception"
-trainingFolder = root + "\\Datasets\\trainingSet\\" + trainingSet
+def run(rootDirectory, originalModel, originalModelFolder, trainingSet="The Obama Deception"):
+    sphinxBinPath = rootDirectory + "\\SphinxTrain\\bin\\Release\\x64"
+    trainingFolder = rootDirectory + "\\Datasets\\trainingSet\\" + trainingSet
+    modelFolder = rootDirectory + "\\Model\\"
+    newLanguangeModel = createAdaption(modelFolder, originalModel, trainingSet, originalModelFolder) + "\\"
+    newAcousticModel = newLanguangeModel + "\\" + originalModel
+    outputFolder = trainingFolder
+    call(get_sphinx_fe_command(newAcousticModel, trainingFolder, trainingSet, outputFolder, sphinxBinPath))
+    call(get_mdef_convert_command(sphinxBinPath, newAcousticModel))
+    call(get_bw_command(sphinxBinPath, newAcousticModel, newLanguangeModel, trainingFolder, trainingSet))
+    call(get_mllr_solve_command(sphinxBinPath, newAcousticModel, trainingFolder))
+    create_newModel(newLanguangeModel)
+    call(get_map_adapt_command(sphinxBinPath, newAcousticModel, trainingFolder, newLanguangeModel))
 
 
-def createAdaption():
+def createAdaption(modelFolder, originalModel, trainingSet, originalModelFolder):
     adaptFolder = modelFolder + "\\" + originalModel + "_Adapt_" + trainingSet
     if os.path.exists(adaptFolder):
         shutil.rmtree(adaptFolder, ignore_errors=True)
     os.makedirs(adaptFolder)
-    copy_tree(originalModelFolder,adaptFolder)
+    copy_tree(originalModelFolder, adaptFolder)
     return adaptFolder
 
-newLanguangeModel = createAdaption() + "\\"
-newAcousticModel = newLanguangeModel + "\\" + originalModel
-outputFolder = trainingFolder
-
-def get_sphinx_fe_command():
+def get_sphinx_fe_command(newAcousticModel, trainingFolder, trainingSet, outputFolder, sphinxBinPath, sampleRate=16000):
     return [sphinxBinPath + "\\sphinx_fe",
             "-argfile", newAcousticModel + "\\feat.params",
             "-samprate", str(sampleRate),
@@ -36,21 +42,22 @@ def get_sphinx_fe_command():
             "-eo", "mfc",
             "-mswav", "yes"]
 
-def get_mdef_convert_command():
+def get_mdef_convert_command(sphinxBinPath, newAcousticModel):
     return [
         sphinxBinPath + "\\pocketsphinx_mdef_convert",
         "-text", newAcousticModel + "\\mdef",
         newAcousticModel + "\\mdef.txt"
     ]
 
-def get_bw_command():
+
+def get_bw_command(sphinxBinPath, newAcousticModel, newLanguangeModel, trainingFolder, trainingSet):
     return [
         sphinxBinPath + "\\bw",
         "-hmmdir", newAcousticModel,
         "-moddeffn", newAcousticModel +"\\mdef.txt",
         "-ts2cbfn", ".cont.",
          "-feat", "1s_c_d_dd",
-        #"-svspec", "0-12/13-25/26-38",
+        # "-svspec", "0-12/13-25/26-38",
         "-lda", newAcousticModel + "\\feature_transform",
         "-cmn", "current",
         "-agc", "none",
@@ -61,7 +68,7 @@ def get_bw_command():
         "-cepdir", trainingFolder
     ]
 
-def get_mllr_solve_command():
+def get_mllr_solve_command(sphinxBinPath, newAcousticModel, trainingFolder):
     return [
         sphinxBinPath + "\\mllr_solve",
         "-meanfn", newAcousticModel + "\\means",
@@ -70,7 +77,7 @@ def get_mllr_solve_command():
         "-accumdir", trainingFolder
     ]
 
-def get_map_adapt_command():
+def get_map_adapt_command(sphinxBinPath, newAcousticModel, trainingFolder, newLanguangeModel):
     return [
         sphinxBinPath + "\\" + "map_adapt",
         "-moddeffn", newAcousticModel + "\\" + "mdef.txt",
@@ -86,7 +93,7 @@ def get_map_adapt_command():
         "-maptmatfn", newLanguangeModel + "\\final" + "\\transition_matrices"
     ]
 
-def create_newModel():
+def create_newModel(newLanguangeModel):
     final = newLanguangeModel + "\\final"
     if os.path.exists(final):
         shutil.rmtree(final, ignore_errors=True)

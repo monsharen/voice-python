@@ -1,54 +1,45 @@
 import os
-import wave
-import sys
 
-def subsGeneration(subsFile):
-    subsArray = []
-    start = ""
-    end = ""
-    text = ''
-    totalSeconds = [60*60,60,1]
-    with open(subsFile, 'r') as f:
-        for line in f:
-            if len(line.split('-->')) == 2:
-                if len(start) >= 1:
-                    subsArray.append([startS,endS,text.strip()])
-                    text = ""
-                start,end = [i.strip() for i in line.split('-->')]
-                startS = sum([float(value.replace(',','.')) * totalSeconds[index] for (index,value) in enumerate(start.split(':')) ])
-                endS = sum([float(value.replace(',','.')) * totalSeconds[index] for (index,value) in enumerate(end.split(':')) ])
-            else:
-                try:
-                    int(line)
-                except:
-                    clean =" ".join([w.rstrip('.,:;!?').lower() for w in line.split()])
-                    text = text + " " + clean
-                    text.strip()
-    return subsArray
+from Modules.training.trainingFilesUtil import *
 
-def generateAudioFiles(origAudio,start,end,fileid):
+if __name__ == "__main__":
 
-    frameRate = origAudioFile.getframerate()
-    nChannels = origAudioFile.getnchannels()
-    sampWidth = origAudioFile.getsampwidth()
-    startFrames = start *frameRate
-    endFrames = end * frameRate
-    origAudio.setpos(int(startFrames))
+    #  Trainingset File Preparation config
+    #  Input
+    trainingSet = "The Obama Deception"
+    inputFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
+    originalAudioFile = inputFolder + 'The_Obama_Deception_HQ_Full_length_version.wav'
+    subsFile = inputFolder + "The Obama Deception [English subtitles v7].srt"
 
-    chunkData = origAudio.readframes(int(endFrames - startFrames))
-    outputFile = trainingSetFolder + fileid + ".wav"
-    chunkAudio = wave.open(outputFile,"w")
-    chunkAudio.setnchannels(nChannels)
-    chunkAudio.setsampwidth(sampWidth)
-    chunkAudio.setframerate(frameRate)
-    chunkAudio.writeframes(chunkData)
-    chunkAudio.close()
+    #  Output
+    outputFolder = inputFolder
+    fileIdsInputFile = outputFolder + "fileids.txt"
+    transcriptionInputFile = outputFolder + "transcription.txt"
+    #  End config
 
-def generateTranscription(text,fileid):
-    transcript = "<s>" + text + "<\s>" + "<" + fileid + ">"
-    transcriptionFile.write(transcript +"\n")
+    print("Parsing subs from file '" + subsFile + "'...")
+    subArray = subsGeneration(subsFile)
 
-def generateFileIds(fileid):
-    fileidsFile.write(fileid + "\n")
+    print("Opening file ids file '" + fileIdsInputFile + "'...")
+    fileIdsFile = open(fileIdsInputFile, "w")
+
+    print("Opening transcription file '" + transcriptionInputFile + "'...")
+    transcriptionFile = open(transcriptionInputFile, "w")
+
+    print("Opening original audio file '" + originalAudioFile + "'...")
+    origAudioFile = wave.open(originalAudioFile, 'r')
+
+    print("Generating all the files...")
+    for (index, value) in enumerate(subArray):
+        start, end, text = value
+        fileid = trainingSet + "_" + str(index)
+        generateAudioFiles(outputFolder, origAudioFile, start, end, fileid)
+        generateTranscription(transcriptionFile, text, fileid)
+        generateFileIds(fileIdsFile, fileid)
+    fileIdsFile.close()
+    transcriptionFile.close()
+    print("Done")
+    print("Output folder: " + outputFolder)
+
 
 

@@ -1,32 +1,27 @@
 import sys
 import os
 import time
+import Modules.training.Trainer as trainer
 
 from Modules.calibration import *
 from Modules.speechAnalytics.config import *
 from Modules.keywordExtraction import *
 from Modules.training.filePreparation import *
-from Modules.training.trainer import *
+
 
 if __name__ == "__main__":
 
     processStartedTime = time.time()
 
-    Root = sys.path[0]
-    os.chdir(Root)
-    sys.path.append(Root + '\\Modules')
+    root = sys.path[0]
+    os.chdir(root)
+    sys.path.append(root + '\\Modules')
     libsFolder = os.path.realpath('.')
     outputFolder = os.path.realpath('..') + "\\Output\\"
 
-    trainingSet = "The Obama Deception"
-    trainingSetFolder = os.path.realpath('..') + "\\Datasets\TrainingSet\\" + trainingSet + "//"
     modelFolder = os.path.realpath('..') + "\\Model\\en-us"
 
-##  Trainingset File Preparation
-    fileidsFile = open(trainingSetFolder + "fileids.txt","w")
-    transcriptionFile = open(trainingSetFolder+"transcription.txt","w")
-    origAudioFile = wave.open(trainingSetFolder + 'The_Obama_Deception_HQ_Full_length_version.wav','r')
-    subsFile = trainingSetFolder + "The Obama Deception [English subtitles v7].srt"
+
 
 ##  Training Model
     sampleRate = 8000
@@ -40,7 +35,7 @@ if __name__ == "__main__":
     recording = trainingSetFolder + "Test.12.wav"
     kwsfile = outputFolder + "kwsfile.txt"
     optkws = outputFolder + "\\optkws.txt"
-    refsfile = outputFolder +  "\\refs.txt"
+    refsfile = outputFolder + "\\refs.txt"
 
     print("Executing pipeline")
     print("dictionaryFile: " + dictionaryFile)
@@ -50,26 +45,11 @@ if __name__ == "__main__":
     print("optkws: " + optkws)
     print("refsfile: " + refsfile)
 
-    print("Generating TrainingFiles...")
-    subArray = subsGeneration(subsFile)
 
-    for (index,value) in enumerate(subArray):
-        start,end,text = value
-        fileid = trainingSet + "_"+ str(index)
-        generateAudioFiles(origAudioFile,start,end,fileid)
-        generateTranscription(text,fileid)
-        generateFileIds(fileid)
-    fileidsFile.close()
-    transcriptionFile.close()
+
 
     print("Training Model...")
-    print(get_sphinx_fe_command())
-    call(get_sphinx_fe_command())
-    call(get_mdef_convert_command())
-    call(get_bw_command())
-    call(get_mllr_solve_command())
-    create_newModel()
-    call(get_map_adapt_command())
+    trainer.run(root, originalModel, originalModelFolder)
 
 
     print("Processing words...")
