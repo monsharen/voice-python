@@ -1,5 +1,5 @@
 import sys, os
-import Modules.word_align
+import Modules.wordAlign
 from pocketsphinx.pocketsphinx import *
 from sphinxbase.sphinxbase import *
 

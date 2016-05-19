@@ -32,7 +32,7 @@ class Config:
                 self.config.set_float('-pbeam', typeParams['beam'])
 
             elif list(typeParams.keys())[i] == "kws-delay":
-                self.config.set_float('-kws-delay', typeParams['kws-delay'])
+                self.config.set_float('-kws_delay', typeParams['kws-delay'])
 
             elif list(typeParams.keys())[i] == "wbeam":
                 self.config.set_float('-wbeam', typeParams['wbeam'])

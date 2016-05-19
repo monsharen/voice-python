@@ -2,25 +2,27 @@ __author__ = 'a.ericsson'
 
 import sys, os
 from Modules.speechAnalytics.speech import *
-from Modules.speechAnalytics.Config import *
+from Modules.speechAnalytics.config import *
 
-from Modules.word_align import *
+from Modules.wordAlign import *
 import numpy as np
 
-def calhelper(config, parRange, refs):
+def calhelper(config, parRange, refs, parameter):
     hyps = {}
     alignments = []
     for par in parRange:
         print("updating config for par ")
-        config.update({'beam': par, 'kws': 'asd'})
+        config.update({parameter: par, 'kws': 'asd'})
         hyp = speechanalytics(config)
         alignment = align(refs, [word[0] for word in hyp])
         hyps[str(par)] = hyp
-        alignments.append(alignment)
-
+        if parameter == 'oog'
+            alignments.append(par,alignment)
+        else:
+            alignments.append(alignment)
     return [alignments, hyps]
 
-def calibration(refkeywords, config, parameter):
+def calibration(refkeywords, config, parameter, optkws = None):
 
     infile = open(refkeywords, "r")
     refs = [word for word in " ".join(infile.readlines()).split()]
@@ -40,28 +42,28 @@ def calibration(refkeywords, config, parameter):
     elif parameter == "wbeam":
         parRange = np.logspace(-30,-5,6)
 
-        #  elif parameter == "oog":
-        #  outfile = open(adjustkwsfile,"w")
-        #  parRange = np.logspace(-20,50,15)
-        #  oogwords = { word:[] for word in refs }
+    elif parameter == "oog":
+        outfile = open(optkws,"w")
+        parRange = np.logspace(-20,50,15)
+        oogwords = { word:[] for word in refs }
+        alignments, hyps = calhelper(config, parRange, refs, parameter)
 
-        #  hyps = calhelper(parmeter,parRange)
+        for (oog,alignment) in alignments:
+            for (ref, hyp) in alignment['alignment']:
+                if ref==hyp:
+                    oogwords[ref].append(oog)
 
-        #  for (ref, hyp) in alignment['alignment']:
-        #     if ref==hyp:
-        #          oogwords[ref].append(oog)
+        for keyword in oogwords.keys():
+            try: max(oogwords[keyword])
+            except:
+                outfile.write(keyword+"\n")
+            else:
+                outfile.write(keyword + "/" + str(max(oogwords[keyword])) + "/\n" )
 
-        #  for keyword in oogwords.keys():
-        #      try: max(oogwords[keyword])
-        #      except:
-        #          outfile.write(keyword+"\n")
-        #      else:
-        #          outfile.write(keyword + "/" + str(max(oogwords[keyword])) + "/\n" )
+        outfile.close()
+        return hyps
 
-        #  outfile.close()
-    #  return hyps
-
-    alignments, hyps = calhelper(config, parRange, refs)
+    alignments, hyps = calhelper(config, parRange, refs, parameter)
     return [alignments, hyps]
 
 def compare (refs,hyp):
