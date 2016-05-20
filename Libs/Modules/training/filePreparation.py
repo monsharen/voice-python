@@ -6,10 +6,10 @@ if __name__ == "__main__":
 
     #  Trainingset File Preparation config
     #  Input
-    trainingSet = "The Obama Deception"
+    trainingSet = "The_Obama_Deception"
     inputFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
     originalAudioFile = inputFolder + 'The_Obama_Deception_HQ_Full_length_version.wav'
-    subsFile = inputFolder + "The Obama Deception [English subtitles v7].srt"
+    subsFile = inputFolder + "The_Obama_Deception_English_subtitles_v7.srt"
 
     #  Output
     outputFolder = inputFolder
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     fileIdsFile = open(fileIdsInputFile, "w")
 
     print("Opening transcription file '" + transcriptionInputFile + "'...")
-    transcriptionFile = open(transcriptionInputFile, "w")
+    transcriptionFile = open(transcriptionInputFile, "w", encoding="utf-8")
 
     print("Opening original audio file '" + originalAudioFile + "'...")
     origAudioFile = wave.open(originalAudioFile, 'r')

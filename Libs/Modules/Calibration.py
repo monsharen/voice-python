@@ -1,8 +1,6 @@
 __author__ = 'a.ericsson'
 
-import sys, os
 from Modules.speechAnalytics.speech import *
-from Modules.speechAnalytics.config import *
 
 from Modules.wordAlign import *
 import numpy as np
@@ -16,7 +14,7 @@ def calhelper(config, parRange, refs, parameter):
         hyp = speechanalytics(config)
         alignment = align(refs, [word[0] for word in hyp])
         hyps[str(par)] = hyp
-        if parameter == 'oog'
+        if parameter == 'oog':
             alignments.append(par,alignment)
         else:
             alignments.append(alignment)

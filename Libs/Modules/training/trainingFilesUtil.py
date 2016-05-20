@@ -45,8 +45,8 @@ def generateAudioFiles(trainingSetFolder, origAudio, start, end, fileid):
 
 
 def generateTranscription(transcriptionFile, text, fileid):
-    transcript = "<s>" + text + "<\s>" + "<" + fileid + ">"
-    transcriptionFile.write(transcript +"\n")
+    transcript = "<s> " + text + " </s>" + " (" + fileid + ")"
+    transcriptionFile.write(transcript + "\n")
 
 
 def generateFileIds(fileidsFile, fileid):

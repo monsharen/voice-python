@@ -8,34 +8,37 @@ from distutils.dir_util import copy_tree
 # root = os.path.realpath('..\\..\\..')
 
 
-def run(rootDirectory, originalModel, originalModelFolder, trainingSet="The Obama Deception"):
+def run(rootDirectory, originalModel, originalModelFolder, trainingSet="The_Obama_Deception", sampleRate=16000):
     sphinxBinPath = rootDirectory + "\\SphinxTrain\\bin\\Release\\x64"
-    trainingFolder = rootDirectory + "\\Datasets\\trainingSet\\" + trainingSet
+    trainingFolder = rootDirectory + "\\Datasets\\TrainingSet\\" + trainingSet
     modelFolder = rootDirectory + "\\Model\\"
-    newLanguangeModel = createAdaption(modelFolder, originalModel, trainingSet, originalModelFolder) + "\\"
+    newLanguangeModel = createAdaption(modelFolder, originalModel, trainingSet, originalModelFolder)
     newAcousticModel = newLanguangeModel + "\\" + originalModel
     outputFolder = trainingFolder
-    call(get_sphinx_fe_command(newAcousticModel, trainingFolder, trainingSet, outputFolder, sphinxBinPath))
+    print(get_sphinx_fe_command(newAcousticModel, trainingFolder, outputFolder, sphinxBinPath, sampleRate))
+    call(get_sphinx_fe_command(newAcousticModel, trainingFolder, outputFolder, sphinxBinPath, sampleRate))
+
+    print(get_mdef_convert_command(sphinxBinPath, newAcousticModel))
     call(get_mdef_convert_command(sphinxBinPath, newAcousticModel))
     call(get_bw_command(sphinxBinPath, newAcousticModel, newLanguangeModel, trainingFolder, trainingSet))
-    call(get_mllr_solve_command(sphinxBinPath, newAcousticModel, trainingFolder))
-    create_newModel(newLanguangeModel)
-    call(get_map_adapt_command(sphinxBinPath, newAcousticModel, trainingFolder, newLanguangeModel))
+    # call(get_mllr_solve_command(sphinxBinPath, newAcousticModel, trainingFolder))
+    # create_newModel(newLanguangeModel)
+    # call(get_map_adapt_command(sphinxBinPath, newAcousticModel, trainingFolder, newLanguangeModel))
 
 
 def createAdaption(modelFolder, originalModel, trainingSet, originalModelFolder):
-    adaptFolder = modelFolder + "\\" + originalModel + "_Adapt_" + trainingSet
+    adaptFolder = modelFolder + originalModel + "_Adapt_" + trainingSet
     if os.path.exists(adaptFolder):
         shutil.rmtree(adaptFolder, ignore_errors=True)
     os.makedirs(adaptFolder)
     copy_tree(originalModelFolder, adaptFolder)
     return adaptFolder
 
-def get_sphinx_fe_command(newAcousticModel, trainingFolder, trainingSet, outputFolder, sphinxBinPath, sampleRate=16000):
+def get_sphinx_fe_command(newAcousticModel, trainingFolder, outputFolder, sphinxBinPath, sampleRate=16000):
     return [sphinxBinPath + "\\sphinx_fe",
             "-argfile", newAcousticModel + "\\feat.params",
             "-samprate", str(sampleRate),
-            "-c", trainingFolder + "\\" + trainingSet + ".fileids.txt",
+            "-c", trainingFolder + "\\fileids.txt",
             "-di", trainingFolder,
             "-do", outputFolder,
             "-ei", "wav",
@@ -62,8 +65,8 @@ def get_bw_command(sphinxBinPath, newAcousticModel, newLanguangeModel, trainingF
         "-cmn", "current",
         "-agc", "none",
         "-dictfn", newLanguangeModel +  "\\cmudict-en-us.dict",
-        "-ctlfn", trainingFolder + "\\" + trainingSet + ".fileids.txt",
-        "-lsnfn", trainingFolder + "\\" + trainingSet + ".transcription.txt",
+        "-ctlfn", trainingFolder + "\\fileids.txt",
+        "-lsnfn", trainingFolder + "\\transcription.txt",
         "-accumdir", trainingFolder,
         "-cepdir", trainingFolder
     ]
