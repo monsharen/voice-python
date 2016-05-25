@@ -15,7 +15,7 @@ def calhelper(config, parRange, refs, parameter):
         alignment = align(refs, [word[0] for word in hyp])
         hyps[str(par)] = hyp
         if parameter == 'oog':
-            alignments.append(par,alignment)
+            alignments.append([par,alignment])
         else:
             alignments.append(alignment)
     return [alignments, hyps]
@@ -42,7 +42,7 @@ def calibration(refkeywords, config, parameter, optkws = None):
 
     elif parameter == "oog":
         outfile = open(optkws,"w")
-        parRange = np.logspace(-20,50,15)
+        parRange = np.logspace(-50,50,5)
         oogwords = { word:[] for word in refs }
         alignments, hyps = calhelper(config, parRange, refs, parameter)
 
@@ -59,7 +59,7 @@ def calibration(refkeywords, config, parameter, optkws = None):
                 outfile.write(keyword + "/" + str(max(oogwords[keyword])) + "/\n" )
 
         outfile.close()
-        return hyps
+        return alignments, hyps
 
     alignments, hyps = calhelper(config, parRange, refs, parameter)
     return [alignments, hyps]

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     modelFolder = root + "\\Model\\en-us"
     fileIdsFile = inputFolder + "fileids.txt"
     transcriptionFile = inputFolder + "transcription.txt"
-    originalAudioFile = inputFolder + 'The_Obama_Deception_HQ_Full_length_version.wav'
+    originalAudioFile = inputFolder + 'The_Obama_Deception.wav'
 
     #   Output
     outputFolder = root + "\\Output\\"
