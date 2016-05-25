@@ -1,15 +1,20 @@
 import os
 
 from Modules.training.trainingFilesUtil import *
+from Modules.training.trainTestSplitt import *
 
 if __name__ == "__main__":
 
     #  Trainingset File Preparation config
+
     #  Input
-    trainingSet = "The_Obama_Deception"
+    trainingSet = "Obama_Cairo_University"
+    trainingSet="The_Obama_Deception"
+    #trainingSet = "arctic"
     inputFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
-    originalAudioFile = inputFolder + 'The_Obama_Deception_HQ_Full_length_version.wav'
-    subsFile = inputFolder + "The_Obama_Deception_English_subtitles_v7.srt"
+    testModelFolder = os.path.realpath('../../../') + "\\Datasets\TestSet\\" + trainingSet + "\\"
+    originalAudioFile = inputFolder + trainingSet +'.wav'
+    subsFile = inputFolder + trainingSet + '.srt'
 
     #  Output
     outputFolder = inputFolder
@@ -29,8 +34,17 @@ if __name__ == "__main__":
     print("Opening original audio file '" + originalAudioFile + "'...")
     origAudioFile = wave.open(originalAudioFile, 'r')
 
-    print("Generating all the files...")
-    for (index, value) in enumerate(subArray):
+    print("Creating Test and Training Split...")
+    train, test = trainTestSplit(fileIds=fileIdsInputFile,subArray=subArray)
+
+    print("Generating test files ...")
+    generateTestTranscript(test,testModelFolder=testModelFolder)
+    start = test[0][0]
+    end = test[-1][1]
+    generateAudioFiles(testModelFolder,origAudioFile,start,end,trainingSet)
+
+    print("Generating training files...")
+    for (index, value) in enumerate(train):
         start, end, text = value
         fileid = trainingSet + "_" + str(index)
         generateAudioFiles(outputFolder, origAudioFile, start, end, fileid)
@@ -39,7 +53,5 @@ if __name__ == "__main__":
     fileIdsFile.close()
     transcriptionFile.close()
     print("Done")
-    print("Output folder: " + outputFolder)
-
-
-
+    print("Training folder: " + outputFolder)
+    print("Test folder: " + testModelFolder)
