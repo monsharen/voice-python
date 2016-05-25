@@ -3,13 +3,16 @@ __author__ = 'a.ericsson'
 
 import os,sys
 from random import randint,choice
+from collections import defaultdict
 
+def make_dict():
+    return defaultdict(make_dict)
 
 def extraction(inputtext, dictionaryFile):
     textfile = open(inputtext, "r", encoding='utf8')
     dictfile = open(dictionaryFile, "r", encoding='utf8')
     dictionary = {word.split(" ")[0]:[i.strip() for i in word.split(" ")[1:]] for word in dictfile.readlines()}
-    words = {str(i): {} for i in range(0, 15)}
+    words = defaultdict(make_dict)
     for w in " ".join(textfile.readlines()).split():
         word = w.rstrip('.,:;!?').lower()
         try:
@@ -19,7 +22,7 @@ def extraction(inputtext, dictionaryFile):
         else:
             index = str(len(dictionary[word.lower()]))
             phones = dictionary[word.lower()]
-            words[index][word] = phones
+            words[index][word]=phones
     return words
 
 def randomSampling(words, numwords, phones=[2,4,6,8],kws="kwsfile.txt"):

@@ -8,7 +8,7 @@ if __name__ == "__main__":
     #  Trainingset File Preparation config
 
     #  Input
-    trainingSet = "Obama_Cairo_University"
+    #trainingSet = "Obama_Cairo_University"
     trainingSet="The_Obama_Deception"
     #trainingSet = "arctic"
     inputFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"

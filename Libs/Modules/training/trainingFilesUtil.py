@@ -1,11 +1,11 @@
 import wave
 
-
 def subsGeneration(subsFile):
     subsArray = []
     start = ""
     end = ""
     text = ''
+    numbers = {i:'number' for i in range(0,100000)}
     totalSeconds = [60*60, 60, 1]
     with open(subsFile, 'r') as f:
         for line in f:
@@ -20,7 +20,7 @@ def subsGeneration(subsFile):
                 try:
                     int(line)
                 except:
-                    clean = " ".join([w.rstrip('.,:;!?').lower() for w in line.split()])
+                    clean = " ".join([w.strip('.,:;!?"[]-').lower()for w in line.split()])
                     text = text + " " + clean
                     text.strip()
     return subsArray
