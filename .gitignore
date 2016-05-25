@@ -1,4 +1,7 @@
+# Our ignored files
 *.wav
+Datasets/
+Output/
 
 # Created by https://www.gitignore.io/api/python
 
