@@ -2,6 +2,7 @@
 *.wav
 Datasets/
 Output/
+TrainingSet/
 
 # Created by https://www.gitignore.io/api/python
 
