@@ -84,6 +84,6 @@ if __name__ == "__main__":
 
     print("Processing reference...")
     subProcessStartedTime = time.time()
-    refs = reference(keyhash=keywords, inputtext=transcriptionFile, refsfile=refsfile)
+    refs = reference(keyhash=keywords, inputtext=rawTranscription, refsfile=refsfile)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(refs)
