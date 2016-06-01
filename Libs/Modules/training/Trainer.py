@@ -10,7 +10,7 @@ from distutils.dir_util import copy_tree
 
 def run(rootDirectory, originalModel, originalModelFolder, trainingSet="The_Obama_Deception", sampleRate=16000):
     sphinxBinPath = rootDirectory + "\\SphinxTrain\\bin\\Release\\x64"
-    trainingFolder = rootDirectory + "\\Datasets\\TrainingSet\\" + trainingSet
+    trainingFolder = rootDirectory + "\\Datasets\\" + trainingSet + "\\TrainingSet"
     modelFolder = rootDirectory + "\\Model\\"
     newLanguangeModel = createAdaption(modelFolder, originalModel, trainingSet, originalModelFolder)
     newAcousticModel = newLanguangeModel + "\\" + originalModel
@@ -21,9 +21,9 @@ def run(rootDirectory, originalModel, originalModelFolder, trainingSet="The_Obam
     print(get_mdef_convert_command(sphinxBinPath, newAcousticModel))
     call(get_mdef_convert_command(sphinxBinPath, newAcousticModel))
     call(get_bw_command(sphinxBinPath, newAcousticModel, newLanguangeModel, trainingFolder, trainingSet))
-    # call(get_mllr_solve_command(sphinxBinPath, newAcousticModel, trainingFolder))
-    # create_newModel(newLanguangeModel)
-    # call(get_map_adapt_command(sphinxBinPath, newAcousticModel, trainingFolder, newLanguangeModel))
+    call(get_mllr_solve_command(sphinxBinPath, newAcousticModel, trainingFolder))
+    create_newModel(newLanguangeModel)
+    call(get_map_adapt_command(sphinxBinPath, newAcousticModel, trainingFolder, newLanguangeModel))
 
 
 def createAdaption(modelFolder, originalModel, trainingSet, originalModelFolder):
