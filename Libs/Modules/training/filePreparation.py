@@ -4,11 +4,12 @@ from Modules.training.trainingFilesUtil import *
 from Modules.training.trainTestSplitt import *
 from Modules.keywordExtraction import extraction, randomSampling, reference
 
-root = os.path.realpath('../../..')  # sys.path[0]
-os.chdir(root)
-sys.path.append(root + '\\Modules')
 
 if __name__ == "__main__":
+
+    root = os.path.realpath('../../..')  # sys.path[0]
+    os.chdir(root)
+    sys.path.append(root + '\\Modules')
 
     #  Trainingset File Preparation config
 
@@ -16,9 +17,9 @@ if __name__ == "__main__":
     #trainingSet = "Obama_Cairo_University"
     dataSetFolder = "The_Obama_Deception"
     #trainingSet = "arctic"
-    trainingSetFolder = os.path.realpath('../../../') + "\\Datasets\\" + dataSetFolder + "\\TrainingSet\\"
-    testSetFolder = os.path.realpath('../../../') + "\\Datasets\\" + dataSetFolder + "\\TestSet\\"
-    metaDataFolder = os.path.realpath('../../../') + "\\Datasets\\" + dataSetFolder + "\\MetaData\\"
+    trainingSetFolder = os.path.realpath('.') + "\\Datasets\\" + dataSetFolder + "\\TrainingSet\\"
+    testSetFolder = os.path.realpath('.') + "\\Datasets\\" + dataSetFolder + "\\TestSet\\"
+    metaDataFolder = os.path.realpath('.') + "\\Datasets\\" + dataSetFolder + "\\MetaData\\"
 
     modelFolder = root + "\\Model\\en-us"
     audioInputFile = trainingSetFolder + dataSetFolder + '.wav'
