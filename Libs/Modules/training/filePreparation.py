@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #trainingSet = "arctic"
     inputFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
     testModelFolder = os.path.realpath('../../../') + "\\Datasets\TestSet\\" + trainingSet + "\\"
-    root = os.path.realpath('..')  # sys.path[0]
+    root = os.path.realpath('../../..')  # sys.path[0]
     os.chdir(root)
     sys.path.append(root + '\\Modules')
     modelFolder = root + "\\Model\\en-us"
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     train, test = trainTestSplit(fileIds=fileIdsInputFile,subArray=subArray)
 
     print("Generating test files ...")
-    generateTestTranscript(test,testModelFolder=testModelFolder)
+    generateRawTranscript(test,testModelFolder=testModelFolder)
     start = test[0][0]
     end = test[-1][1]
     generateAudioFiles(testModelFolder,origAudioFile,start,end,trainingSet)
@@ -67,12 +67,10 @@ if __name__ == "__main__":
     print("Test folder: " + testModelFolder)
 
     print("Processing words...")
-    for i in subArray:
-        transcriptionRawFile.write(i[2] + " ")
-    transcriptionRawFile.close()
+    generateRawTranscript(subArray,inputFolder)
 
     subProcessStartedTime = time.time()
-    words = extraction(transcriptionRawFile, dictionaryFile)
+    words = extraction(rawTranscription, dictionaryFile)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(words)
 
