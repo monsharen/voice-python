@@ -5,7 +5,7 @@ def subsGeneration(subsFile):
     start = ""
     end = ""
     text = ''
-    numbers = {i:'number' for i in range(0,100000)}
+    numbers = {i: 'number' for i in range(0, 100000)}
     totalSeconds = [60*60, 60, 1]
     with open(subsFile, 'r') as f:
         for line in f:
@@ -14,8 +14,8 @@ def subsGeneration(subsFile):
                     subsArray.append([startS, endS, text.strip()])
                     text = ""
                 start, end = [i.strip() for i in line.split('-->')]
-                startS = sum([float(value.replace(',', '.')) * totalSeconds[index] for (index,value) in enumerate(start.split(':'))])
-                endS = sum([float(value.replace(',', '.')) * totalSeconds[index] for (index,value) in enumerate(end.split(':'))])
+                startS = sum([float(value.replace(',', '.')) * totalSeconds[index] for (index, value) in enumerate(start.split(':'))])
+                endS = sum([float(value.replace(',', '.')) * totalSeconds[index] for (index, value) in enumerate(end.split(':'))])
             else:
                 try:
                     int(line)
@@ -51,3 +51,4 @@ def generateTranscription(transcriptionFile, text, fileid):
 
 def generateFileIds(fileidsFile, fileid):
     fileidsFile.write(fileid + "\n")
+
