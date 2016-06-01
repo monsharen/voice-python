@@ -2,7 +2,7 @@ import os,sys,time
 
 from Modules.training.trainingFilesUtil import *
 from Modules.training.trainTestSplitt import *
-from Modules.keywordExtraction import extraction,randomSampling,reference
+from Modules.keywordExtraction import extraction, randomSampling, reference
 
 if __name__ == "__main__":
 
@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
     #  Input
     #trainingSet = "Obama_Cairo_University"
-    trainingSet="The_Obama_Deception"
+    trainingSet = "The_Obama_Deception"
     #trainingSet = "arctic"
     inputFolder = os.path.realpath('../../../') + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
     testModelFolder = os.path.realpath('../../../') + "\\Datasets\TestSet\\" + trainingSet + "\\"
@@ -40,13 +40,13 @@ if __name__ == "__main__":
 
     print("Opening transcription file '" + transcriptionInputFile + "'...")
     transcriptionFile = open(transcriptionInputFile, "w", encoding="utf-8")
-    transcriptionRawFile = open(rawTranscription,"w",encoding="utf-8")
+    transcriptionRawFile = open(rawTranscription, "w", encoding="utf-8")
 
     print("Opening original audio file '" + originalAudioFile + "'...")
     origAudioFile = wave.open(originalAudioFile, 'r')
 
     print("Creating Test and Training Split...")
-    train, test = trainTestSplit(fileIds=fileIdsInputFile,subArray=subArray)
+    train, test = trainTestSplit(fileIds=fileIdsInputFile, subArray=subArray)
 
     print("Generating test files ...")
     generateRawTranscript(test,testTranscription)
@@ -77,8 +77,8 @@ if __name__ == "__main__":
 
     print("Processing keywords...")
     subProcessStartedTime = time.time()
-    keywords = randomSampling (words, 100, phones=[6], kws=kwsfile)
-    kws = open(kwsfile,'rb')
+    keywords = randomSampling(words, 100, phones=[6], kws=kwsfile)
+    kws = open(kwsfile, 'rb')
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(keywords)
 
