@@ -1,6 +1,6 @@
 import wave
 
-def subsGeneration(subsFile):
+def subtitleGeneration(subsFile):
     subsArray = []
     start = ""
     end = ""
@@ -44,7 +44,7 @@ def generateAudioFiles(trainingSetFolder, origAudio, start, end, fileid):
     chunkAudio.close()
 
 
-def generateTranscription(transcriptionFile, text, fileid):
+def generateTrainingTranscription(transcriptionFile, text, fileid):
     transcript = "<s> " + text + " </s>" + " (" + fileid + ")"
     transcriptionFile.write(transcript + "\n")
 

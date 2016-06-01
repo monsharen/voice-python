@@ -12,7 +12,7 @@ def trainTestSplit(train=0.6,test=0.4,fileIds=None,subArray=None):
     testFiles  = subArray[trainIndex:size]
     return [trainFiles,testFiles]
 
-def generateRawTranscript(testFiles, rawTranscription):
+def generateTranscript(testFiles, rawTranscription):
     testTranscription=" ".join([element[2] for element in testFiles] )
     transcription = open(rawTranscription,'w',encoding="utf8")
     transcription.write(testTranscription + " ")
