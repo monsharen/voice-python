@@ -19,45 +19,33 @@ if __name__ == "__main__":
     libsFolder = os.path.realpath('.')
 
     #   Input
-    trainingSet = "The_Obama_Deception"
-    # trainingSet = "arctic"
-    inputFolder = root + "\\Datasets\TrainingSet\\" + trainingSet + "\\"
+    dataSetFolder = "The_Obama_Deception"
+    testSetFolder = root + "\\Datasets\\" + dataSetFolder + "\\TestSet\\"
+    metaDataFolder = root + "\\Datasets\\" + dataSetFolder + "\\MetaData\\"
+
+    trainingSetFolder = root + "\\Datasets\\" + dataSetFolder + "\\TrainingSet\\"
     modelFolder = root + "\\Model\\en-us"
-    fileIdsFile = inputFolder + "fileids.txt"
-    transcriptionFile = inputFolder + "transcription.txt"
-    originalAudioFile = inputFolder + 'The_Obama_Deception.wav'
-
-    #   Output
-    outputFolder = root + "\\Output\\"
-
-    #   Training Model
-    sampleRate = 16000
-    originalModel = "cmusphinx-en-us-5.2"
-    originalModelFolder = root + "\\model\\" + originalModel  # + originalModel
-    sphinxBinPath = root + "\\SphinxTrain\\bin\\Release\\x64"
-    ##
+    fileIdsFile = trainingSetFolder + "fileids.txt"
+    transcriptionInputFile = trainingSetFolder + "transcription.txt"
+    audioInputFile = trainingSetFolder + 'The_Obama_Deception.wav'
 
     dictionaryFile = modelFolder + "\\cmudict-en-us.dict"
     acousticModel = modelFolder + "\\en-us"
 
-    kwsfile = outputFolder + "kwsfile.txt"
-    optkws = outputFolder + "optkws.txt"
-    refsfile = outputFolder + "refs.txt"
+    kwsfile = metaDataFolder + "kwsfile.txt"
+    optkws = metaDataFolder + "optkws.txt"
+    refsfile = metaDataFolder + "refs.txt"
 
     print("Executing pipeline")
     print("dictionaryFile: " + dictionaryFile)
-    print("transcriptionFile: " + transcriptionFile)
-    print("originalAudioFile: " + originalAudioFile)
+    print("transcriptionInputFile: " + transcriptionInputFile)
     print("kwsfile: " + kwsfile)
     print("optkws: " + optkws)
     print("refsfile: " + refsfile)
 
-    print("Training Model...")
-    #trainer.run(root, originalModel, originalModelFolder, sampleRate=sampleRate, trainingSet=trainingSet)
-
     print("Processing words...")
     subProcessStartedTime = time.time()
-    words = extraction(transcriptionFile, dictionaryFile)
+    words = extraction(transcriptionInputFile, dictionaryFile)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(words)
 
@@ -71,13 +59,13 @@ if __name__ == "__main__":
 
     print("Processing reference...")
     subProcessStartedTime = time.time()
-    refs = reference(keyhash=keywords, inputtext=transcriptionFile, refsfile=refsfile)
+    refs = reference(keyhash=keywords, inputtext=transcriptionInputFile, refsfile=refsfile)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(refs)
 
     print("Processing calibration...")
     subProcessStartedTime = time.time()
-    config = Config(acousticModel, dictionaryFile, originalAudioFile, kwsfile)
+    config = Config(acousticModel, dictionaryFile, audioInputFile, kwsfile)
     alignments, hyps = calibration(refkeywords=refsfile, config=config, parameter='oog',optkws=optkws)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(hyps)
