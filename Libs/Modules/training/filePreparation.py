@@ -27,6 +27,7 @@ if __name__ == "__main__":
     fileIdsInputFile = outputFolder + "fileids.txt"
     transcriptionInputFile = outputFolder + "transcription.txt"
     rawTranscription = outputFolder + "rawtranscription.txt"
+    testTranscription = testModelFolder + "transcription.txt"
     kwsfile = outputFolder + "kwsfile.txt"
     refsfile = outputFolder + "refs.txt"
     #  End config
@@ -48,16 +49,16 @@ if __name__ == "__main__":
     train, test = trainTestSplit(fileIds=fileIdsInputFile, subArray=subArray)
 
     print("Generating test files ...")
-    generateRawTranscript(test, testModelFolder=testModelFolder)
-#    start = test[0][0]
-#    end = test[-1][1]
-#    generateAudioFiles(testModelFolder,origAudioFile,start,end,trainingSet)
+    generateRawTranscript(test,testTranscription)
+    start = test[0][0]
+    end = test[-1][1]
+    generateAudioFiles(testModelFolder,origAudioFile,start,end,trainingSet)
 
     print("Generating training files...")
     for (index, value) in enumerate(train):
         start, end, text = value
         fileid = trainingSet + "_" + str(index)
-#        generateAudioFiles(outputFolder, origAudioFile, start, end, fileid)
+        generateAudioFiles(outputFolder, origAudioFile, start, end, fileid)
         generateTranscription(transcriptionFile, text, fileid)
         generateFileIds(fileIdsFile, fileid)
     fileIdsFile.close()
@@ -67,7 +68,7 @@ if __name__ == "__main__":
     print("Test folder: " + testModelFolder)
 
     print("Processing words...")
-    generateRawTranscript(subArray, inputFolder)
+    generateRawTranscript(subArray,rawTranscription)
 
     subProcessStartedTime = time.time()
     words = extraction(rawTranscription, dictionaryFile)
