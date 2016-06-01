@@ -53,7 +53,7 @@ if __name__ == "__main__":
     print("refsfile: " + refsfile)
 
     print("Training Model...")
-    trainer.run(root, originalModel, originalModelFolder, sampleRate=sampleRate, trainingSet=trainingSet)
+    #trainer.run(root, originalModel, originalModelFolder, sampleRate=sampleRate, trainingSet=trainingSet)
 
     print("Processing words...")
     subProcessStartedTime = time.time()
