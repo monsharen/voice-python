@@ -1,7 +1,8 @@
 import Modules.training.Trainer as trainer
 
 from Modules.training.filePreparation import *
-
+from Modules.Calibration import *
+from Modules.speechAnalytics.Config import *
 
 if __name__ == "__main__":
 
@@ -21,17 +22,20 @@ if __name__ == "__main__":
 
     #   Input
     trainingSetFolder = root + "\\Datasets\\" + dataSetFolder + "\\TrainingSet\\"
-    modelFolder = root + "\\Model\\cmusphinx-en-us-5.2"
     fileIdsFile = trainingSetFolder + "fileids.txt"
     transcriptionInputFile = trainingSetFolder + "transcription.txt"
     kwsInputFile = metaDataFolder + "kwsfile.txt"
     optkwsOutputFile = metaDataFolder + "optkws.txt"
+    referenceInputfile = metaDataFolder + "reference_file.txt"
+    audioInputFile = trainingSetFolder + dataSetFolder + '.wav'
 
     #   Training Model
     sampleRate = 16000
     originalModel = "cmusphinx-en-us-5.2"
-    originalModelFolder = root + "\\model\\" + originalModel  # + originalModel
+    originalModelFolder = root + "\\Model\\" + originalModel  # + originalModel
     sphinxBinPath = root + "\\SphinxTrain\\bin\\Release\\x64"
+    acousticModel = root + "\\Model\\" + originalModel + "_Adapt_" + dataSetFolder + "\\" + originalModel
+    dictionaryFile = originalModelFolder + "\\cmudict-en-us.dict"
 
     print("Executing pipeline")
     print("transcriptionFile: " + transcriptionInputFile)
@@ -40,3 +44,10 @@ if __name__ == "__main__":
 
     print("Training Model...")
     trainer.run(root, originalModel, originalModelFolder, sampleRate=sampleRate, trainingSet=dataSetFolder)
+
+    print("Processing calibration...")
+    config = Config(acousticModel, dictionaryFile, audioInputFile, kwsInputFile)
+    alignments, hyps = calibration(refkeywords=referenceInputfile, config=config, parameter='oog', optkws=optkwsOutputFile)
+    print("Process took %s seconds" % (time.time() - processStartedTime))
+    print(hyps)
+    print(alignments)
