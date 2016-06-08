@@ -28,6 +28,10 @@ def get_data_set(dataSetName):
     _dataSet.metaData.optkwsFile = _dataSet.metaData.folder + "optkws.txt"
     _dataSet.metaData.referenceFile = _dataSet.metaData.folder + "reference_file.txt"
 
+    _dataSet.trainingSet.folder = trainingSetFolder = root + "\\Datasets\\" + _dataSet.name + "\\TrainingSet\\"
+    _dataSet.trainingSet.fileIdsFile = trainingSetFolder + "fileids.txt"
+    _dataSet.trainingSet.audioInputFile = trainingSetFolder + _dataSet.name + '.wav'
+
     return _dataSet
 
 
@@ -81,16 +85,26 @@ class TestSet:
         print("audioInputFile: " + self.audioInputFile)
 
 
+class TrainingSet:
+    folder = ""
+    fileIdsFile = ""
+    audioInputFile = ""
+
+    def print(self):
+        print("TrainingSet")
+
 class DataSet:
     name = ""
     testSet = TestSet()
     metaData = MetaData()
+    trainingSet = TrainingSet()
 
     def print(self):
         print("DataSet")
         print("name: " + self.name)
         self.testSet.print()
         self.metaData.print()
+        self.trainingSet.print()
 
 
 
