@@ -49,7 +49,7 @@ if __name__ == "__main__":
     audioFile = wave.open(audioInputFile, 'r')
 
     print("Creating Test and Training Split...")
-    train, test = trainTestSplit(fileIds=fileIdsInputFile, subArray=subtitlesArray)
+    train, test = trainTestSplit(subArray=subtitlesArray)
 
     print("Generating test files ...")
     generateTranscript(test, testTranscriptionFile)
@@ -87,6 +87,6 @@ if __name__ == "__main__":
 
     print("Processing reference...")
     subProcessStartedTime = time.time()
-    refs = reference(keyhash=keywords, inputtext=fullTranscriptionOutputFile, refsfile=referenceFile)
+    refs = reference(keyhash=keywords, inputtext=testTranscriptionFile, refsfile=referenceFile)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(refs)
