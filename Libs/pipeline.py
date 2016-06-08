@@ -7,7 +7,7 @@ from Modules.Calibration import *
 from Modules.speechAnalytics.Config import *
 from Modules.keywordExtraction import *
 from Modules.training.filePreparation import *
-
+from configuration import *
 
 if __name__ == "__main__":
 
@@ -19,28 +19,14 @@ if __name__ == "__main__":
     libsFolder = os.path.realpath('.')
 
     #   Input
-    dataSetFolder = "The_Obama_Deception"
-    testSetFolder = root + "\\Datasets\\" + dataSetFolder + "\\TestSet\\"
-    metaDataFolder = root + "\\Datasets\\" + dataSetFolder + "\\MetaData\\"
-
-    modelFolder = root + "\\Model\\en-us"
-    transcriptionInputFile = testSetFolder + "transcription.txt"
-    audioInputFile = testSetFolder + 'The_Obama_Deception.wav'
-
-    dictionaryFile = modelFolder + "\\cmudict-en-us.dict"
-    acousticModel = modelFolder + "\\en-us"
-
-    kwsfile = metaDataFolder + "kwsfile.txt"
-    # optkws = metaDataFolder + "optkws.txt"
-    optkws = kwsfile
-    referenceInputFile = metaDataFolder + "reference_file.txt"
+    dataSet = get_data_set("The_Obama_Deception")
+    # dataSetFolder, testSetFolder, metaDataFolder, transcriptionInputFile, audioInputFile = get_data_set("The_Obama_Deception")
+    # modelFolder, dictionaryFile, acousticModel = get_model("en-us")
+    model = get_model("en-us")
 
     print("Executing pipeline")
-    print("dictionaryFile: " + dictionaryFile)
-    print("transcriptionInputFile: " + transcriptionInputFile)
-    print("kwsfile: " + kwsfile)
-    print("optkws: " + optkws)
-    print("refsfile: " + referenceInputFile)
+    print(model.print())
+    print(dataSet.print())
 
     # print("Processing words...")
     # subProcessStartedTime = time.time()
@@ -51,19 +37,19 @@ if __name__ == "__main__":
     print("Reading keywords...")
     # subProcessStartedTime = time.time()
     # keywords = randomSampling(words, 5, phones=[6], kws=kwsfile)
-    kws = open(optkws, 'r')
+    kws = open(dataSet.metaData.optkws, 'r')
     keywords = [ word for word in " ".join(kws.readlines()).split() ]
     # print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(keywords)
 
     print("Reading reference file...")
     subProcessStartedTime = time.time()
-    referenceFile = open(referenceInputFile, 'r')  # reference(keyhash=keywords, inputtext=transcriptionInputFile, refsfile=refsfile)
+    referenceFile = open(dataSet.metaData.referenceFile, 'r')  # reference(keyhash=keywords, inputtext=transcriptionInputFile, refsfile=refsfile)
     referenceArray = [word for word in " ".join(referenceFile.readlines()).split()]
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(referenceArray)
 
-    config = Config(acousticModel, dictionaryFile, audioInputFile, optkws)
+    config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.optkws)
     config.update({"ogg": 1e+30, "kws": "test"})
 
     print("Processing speech analytics...")
@@ -75,7 +61,7 @@ if __name__ == "__main__":
 
     print("Comparing kwsfile and adjustedhyp")
     subProcessStartedTime = time.time()
-    results = compare(referenceInputFile, hypothesis)
+    results = compare(dataSet.metaData.referenceFile, hypothesis)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(results)
 
