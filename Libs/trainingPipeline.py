@@ -9,11 +9,6 @@ if __name__ == "__main__":
 
     processStartedTime = time.time()
 
-    root = os.path.realpath('..')  # sys.path[0]
-    os.chdir(root)
-    sys.path.append(root + '\\Modules')
-    libsFolder = os.path.realpath('.')
-
     dataSetFolder = "The_Obama_Deception"
     dataSet = get_data_set(dataSetFolder)
 
