@@ -43,10 +43,10 @@ def align(refs, hyps):
                 backtrace_matrix[i][j] = INS
             elif m == dels:
                 backtrace_matrix[i][j] = DEL
-    return backtrace(refs, hyps, align_matrix, backtrace_matrix)
+    return backtrace(refs, hyps, backtrace_matrix)
 
     
-def backtrace(refs, hyps, align_matrix, backtrace_matrix):
+def backtrace(refs, hyps, backtrace_matrix):
     
     alignment = []
     inspen, delpen, substpen, match = (0, 0, 0, 0)

@@ -19,7 +19,7 @@ class WordAlignTest(unittest.TestCase):
         backtrace_matrix = [[2, 1, 1], [2, 0, 0], [2, 0, 0]]
 
         expected = {'alignment':[('REF1', 'HYP1'), ('REF2', 'HYP2')],'Ins':0,'Del':0,'Subs':2}
-        actual = backtrace(refs, hyps, "", backtrace_matrix)
+        actual = backtrace(refs, hyps, backtrace_matrix)
         self.assertEqual(expected, actual)
 
 if __name__ == '__main__':
