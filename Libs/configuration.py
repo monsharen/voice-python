@@ -38,7 +38,7 @@ def get_data_set(dataSetName):
 def get_model(modelFolderName):
     _modelFolder = root + "\\Model\\" + modelFolderName
     _dictionaryFile = _modelFolder + "\\cmudict-en-us.dict"
-    _acousticModel = _modelFolder + "\\en-us"
+    _acousticModel = _modelFolder + "\\" + modelFolderName
     model = Model()
     model.folder = _modelFolder
     model.dictionaryFile = _dictionaryFile

@@ -9,7 +9,12 @@ if __name__ == "__main__":
 
     processStartedTime = time.time()
 
-    dataSetFolder = "The_Obama_Deception"
+    #root = os.path.realpath('..')  # sys.path[0]
+    #os.chdir(root)
+    #sys.path.append(root + '\\Modules')
+    #libsFolder = os.path.realpath('.')
+
+    dataSetFolder = "PDAm"
     dataSet = get_data_set(dataSetFolder)
 
     modelName = "cmusphinx-en-us-5.2"
@@ -29,10 +34,10 @@ if __name__ == "__main__":
     dataSet.print()
 
     print("Training Model...")
-    trainer.run(root, modelName, model.folder, sampleRate=sampleRate, trainingSet=dataSetFolder)
+   # trainer.run(root, modelName, model.folder, sampleRate=sampleRate, trainingSet=dataSetFolder)
 
     print("Processing calibration...")
-    config = Config(acousticModel, dictionaryFile, dataSet.trainingSet.audioInputFile, dataSet.metaData.kwsFileFile)
+    config = Config(acousticModel, dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.kwsFile)
     alignments, hyps = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
     print("Process took %s seconds" % (time.time() - processStartedTime))
     print(hyps)

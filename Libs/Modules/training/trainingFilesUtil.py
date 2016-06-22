@@ -25,6 +25,40 @@ def subtitleGeneration(subsFile):
                     text.strip()
     return subsArray
 
+def sent2transcription(sent):
+    transcriptionArray = []
+    with open(sent,"r") as f :
+        for line in f :
+            text, fileid = line.split('(')
+            clean = " ".join([w.strip('.,:;!?"[]-').lower()for w in text.split()])
+            clean = clean.strip()
+            fileid = fileid.split(")")[0]
+            transcriptionArray.append([fileid,clean])
+    return transcriptionArray
+
+def concatenateAudioFiles(fileArray,testFolder, outputFile):
+
+    outputFile = wave.open(outputFile,"w")
+    outputFile.setnchannels(1)
+    outputFile.setsampwidth(2)
+    outputFile.setframerate(16000)
+
+    for element in fileArray:
+
+        file = element[0]
+        inputAudioFile = testFolder + file + ".wav"
+        origAudio = wave.open(inputAudioFile,"r")
+        frameRate = origAudio.getframerate()
+        nChannels = origAudio.getnchannels()
+        sampWidth = origAudio.getsampwidth()
+        print(frameRate)
+        print(nChannels)
+        print(sampWidth)
+        frames = origAudio.getnframes()
+        data = origAudio.readframes(frames)
+        outputFile.writeframesraw(data)
+
+    outputFile.close()
 
 def generateAudioFiles(trainingSetFolder, origAudio, start, end, fileid):
     frameRate = origAudio.getframerate()

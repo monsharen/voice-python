@@ -19,38 +19,27 @@ if __name__ == "__main__":
     libsFolder = os.path.realpath('.')
 
     #   Input
-    dataSet = get_data_set("The_Obama_Deception")
-    # dataSetFolder, testSetFolder, metaDataFolder, transcriptionInputFile, audioInputFile = get_data_set("The_Obama_Deception")
-    # modelFolder, dictionaryFile, acousticModel = get_model("en-us")
+    dataSet = get_data_set("PDAm")
     model = get_model("en-us")
 
     print("Executing pipeline")
     print(model.print())
     print(dataSet.print())
 
-    # print("Processing words...")
-    # subProcessStartedTime = time.time()
-    # words = extraction(transcriptionInputFile, dictionaryFile)
-    # print("Process took %s seconds" % (time.time() - subProcessStartedTime))
-    # print(words)
-
     print("Reading keywords...")
-    # subProcessStartedTime = time.time()
-    # keywords = randomSampling(words, 5, phones=[6], kws=kwsfile)
-    kws = open(dataSet.metaData.optkws, 'r')
+    kws = open(dataSet.metaData.optkwsFile, 'r')
     keywords = [ word for word in " ".join(kws.readlines()).split() ]
-    # print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(keywords)
 
     print("Reading reference file...")
-    subProcessStartedTime = time.time()
-    referenceFile = open(dataSet.metaData.referenceFile, 'r')  # reference(keyhash=keywords, inputtext=transcriptionInputFile, refsfile=refsfile)
+    referenceFile = open(dataSet.metaData.referenceFile, 'r')
     referenceArray = [word for word in " ".join(referenceFile.readlines()).split()]
-    print("Process took %s seconds" % (time.time() - subProcessStartedTime))
+    #print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(referenceArray)
 
-    config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.optkws)
-    config.update({"ogg": 1e+30, "kws": "test"})
+    config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.optkwsFile)
+    #config.update({"oog":1e+5, "kws":"test"})
+    config.update({"kws":"test"})
 
     print("Processing speech analytics...")
     subProcessStartedTime = time.time()
@@ -59,7 +48,7 @@ if __name__ == "__main__":
     print(hypothesis)
     print(referenceArray)
 
-    print("Comparing kwsfile and adjustedhyp")
+    print("Comparing alignment to reference")
     subProcessStartedTime = time.time()
     results = compare(dataSet.metaData.referenceFile, hypothesis)
     print("Process took %s seconds" % (time.time() - subProcessStartedTime))
