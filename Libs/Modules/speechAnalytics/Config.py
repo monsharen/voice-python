@@ -22,6 +22,7 @@ class Config:
 
         for i in range(0, len(typeParams)):
             if list(typeParams.keys())[i] == "oog":
+                self.config.set_string('-kws', self.kwsfile)
                 self.config.set_float('-kws_threshold', typeParams['oog'])
 
             elif list(typeParams.keys())[i] == "wip":
