@@ -17,7 +17,7 @@ def speechanalytics(config):
     stream = open(config.getAudioFile(), "rb")
 
     result = ''
-    if (kws != None) or (keyphrase == "keyphrase"):
+    if (kws is not None) or (keyphrase == "keyphrase"):
         print("kws: " + str(kws) + ", lm: " + str(lm))
         result = keyword_spotting(config, stream)
 
@@ -40,7 +40,7 @@ def transcribe(config, stream):
     return hypothesis.hypstr
 
 
-def keyword_spotting(config, stream,threshold=20):
+def keyword_spotting(config, stream, threshold=20):
     result = []
     decoder = Decoder(config.getSphinxConfig())
     decoder.start_utt()
@@ -51,7 +51,8 @@ def keyword_spotting(config, stream,threshold=20):
             decoder.process_raw(buf, False, False)
         else:
             break
-        if decoder.hyp() != None:
+
+        if decoder.hyp() is not None:
             for seg in decoder.seg():
                 if seg.prob > threshold:
                     result.append([seg.word, seg.prob, seg.start_frame, seg.end_frame])
