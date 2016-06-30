@@ -17,7 +17,8 @@ if __name__ == "__main__":
     dataSetFolder = "PDAm"
     dataSet = get_data_set(dataSetFolder)
 
-    modelName = "cmusphinx-en-us-5.2"
+    #modelName = "cmusphinx-en-us-5.2"
+    modelName = "en-us"
     model = get_model(modelName)
 
     #   Output
@@ -37,8 +38,9 @@ if __name__ == "__main__":
    # trainer.run(root, modelName, model.folder, sampleRate=sampleRate, trainingSet=dataSetFolder)
 
     print("Processing calibration...")
-    config = Config(acousticModel, dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.kwsFile)
-    alignments, hyps = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
+    config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.kwsFile)
+    #alignments, hyps = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
+    accuracyWord,bestOogForWord = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
     print("Process took %s seconds" % (time.time() - processStartedTime))
-    print(hyps)
-    print(alignments)
+    print(bestOogForWord)
+    #print(alignments)

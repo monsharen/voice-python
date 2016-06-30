@@ -20,14 +20,15 @@ if __name__ == "__main__":
 
     #   Input
     dataSet = get_data_set("PDAm")
-    model = get_model("en-us")
+    model = get_model("cmusphinx-en-us-5.2_Adapt_PDAm")
 
     print("Executing pipeline")
     print(model.print())
     print(dataSet.print())
 
     print("Reading keywords...")
-    kws = open(dataSet.metaData.optkwsFile, 'r')
+    #kws = open(dataSet.metaData.optkwsFile, 'r')
+    kws = open(dataSet.metaData.kwsFile, 'r')
     keywords = [ word for word in " ".join(kws.readlines()).split() ]
     print(keywords)
 
@@ -37,9 +38,10 @@ if __name__ == "__main__":
     #print("Process took %s seconds" % (time.time() - subProcessStartedTime))
     print(referenceArray)
 
-    config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.optkwsFile)
-    #config.update({"oog":1e+5, "kws":"test"})
-    config.update({"kws":"test"})
+    #config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.optkwsFile)
+    config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.kwsFile)
+    config.update({"oog":1e+3, "kws":"test"})
+    #config.update({"kws":"test"})
 
     print("Processing speech analytics...")
     subProcessStartedTime = time.time()

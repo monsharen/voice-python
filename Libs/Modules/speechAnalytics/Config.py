@@ -14,11 +14,12 @@ class Config:
         self.audioFile = audiofile
         self.config = Decoder.default_config()
         self.kwsfile = kwsfile
-
+        self.config.set_string('-logfn','nul')
     def update(self, typeParams):
 
         self.config.set_string('-hmm', self.languageModel)
         self.config.set_string('-dict', self.languageDictionary)
+
 
         for i in range(0, len(typeParams)):
             if list(typeParams.keys())[i] == "oog":

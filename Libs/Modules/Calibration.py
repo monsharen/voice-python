@@ -6,19 +6,53 @@ from Modules.wordAlign import *
 import numpy as np
 
 def calhelper(config, parRange, refs, parameter):
-    hyps = {}
+
+    previous = {}
     alignments = []
+    AccuracyWord = {word:{par:{'TP':0,'FP':0 ,'FN':0,'Accuracy':0,'freq':refs.count(word)}for par in parRange} for word in refs }
+
+    bestOogForWord = {'word':'oog'}
     for par in parRange:
         print("updating config for par ")
+
         config.update({parameter: par})
         hyp = speechanalytics(config)
         alignment = align(refs, [word[0] for word in hyp])
-        hyps[str(par)] = hyp
-        if parameter == 'oog':
-            alignments.append([par,alignment])
-        else:
-            alignments.append(alignment)
-    return [alignments, hyps]
+
+        for (ref, hyp) in alignment['alignment']:
+
+            if ref != hyp:
+                if ref == '-':
+                    w = AccuracyWord.get(hyp.lower())
+                    if w is not None:
+                        AccuracyWord[hyp.lower()][par]['FP'] +=1
+                elif hyp == '-':
+                    AccuracyWord[ref.lower()][par]['FN'] +=1
+                else:
+                    w = AccuracyWord.get(hyp.lower())
+                    if w is not None:
+                        AccuracyWord[hyp.lower()][par]['FP'] +=1
+                    w = AccuracyWord.get(ref.lower())
+                    if w is not None:
+                        AccuracyWord[ref.lower()][par]['FN'] +=1
+
+            if ref == hyp:
+                AccuracyWord[ref.lower()][par]['TP'] +=1
+
+        print(AccuracyWord)
+
+        for word in AccuracyWord.keys():
+            bestAccuracy = 0
+            bestPar = 0
+            for par in parRange:
+                AccuracyWord[word][par]['Accuracy'] = float(1) - float(AccuracyWord[word][par]['FP'] + AccuracyWord[word][par]['FN'] / AccuracyWord[word][par]['freq'])
+                Accuracy = AccuracyWord[word][par]['Accuracy']
+                if Accuracy > bestAccuracy:
+                    bestAccuracy = Accuracy
+                    bestPar = par
+            bestOogForWord[word]=bestPar
+
+    return [AccuracyWord,bestOogForWord]
 
 def calibration(refkeywords, config, parameter, optkws = None):
 
@@ -42,24 +76,21 @@ def calibration(refkeywords, config, parameter, optkws = None):
 
     elif parameter == "oog":
         outfile = open(optkws,"w")
-        parRange = np.logspace(-50,50,5)
-        oogwords = { word:[] for word in refs }
-        alignments, hyps = calhelper(config, parRange, refs, parameter)
+        parRange = np.logspace(-15,15,3)
+        #parRange = [1e+1,1e+25]
+        AccuracyWord,bestOogForWord = calhelper(config, parRange, refs, parameter)
 
-        for (oog,alignment) in alignments:
-            for (ref, hyp) in alignment['alignment']:
-                if ref==hyp:
-                    oogwords[ref].append(oog)
+        for keyword in bestOogForWord.keys():
+            bestOog = bestOogForWord[keyword]
+            # allInfo = AccuracyWord[keyword]
 
-        for keyword in oogwords.keys():
-            try: max(oogwords[keyword])
-            except:
+            if bestOog == 0:
                 outfile.write(keyword+"\n")
             else:
-                outfile.write(keyword + "/" + str(max(oogwords[keyword])) + "/\n" )
+                outfile.write(keyword + "/" + str(bestOog) + "/\n" )
 
         outfile.close()
-        return alignments, hyps
+        return [AccuracyWord,bestOogForWord]
 
     alignments, hyps = calhelper(config, parRange, refs, parameter)
     return [alignments, hyps]
