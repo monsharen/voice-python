@@ -3,6 +3,7 @@ __author__ = 'a.ericsson'
 from Modules.speechAnalytics.speech import *
 
 from Modules.wordAlign import *
+import json
 import numpy as np
 
 def calhelper(config, parRange, refs, parameter):
@@ -53,6 +54,25 @@ def calhelper(config, parRange, refs, parameter):
             bestOogForWord[word]=bestPar
 
     return [AccuracyWord,bestOogForWord]
+
+def saveHypsToDisk(config, parRange, refs, parameter):
+    outfile = open("filnamn", "w")   # <--- change filename
+    hypsForPar = {}
+    for par in parRange:
+        print("updating config for par ")
+
+        config.update({parameter: par})
+        hyp = speechanalytics(config)
+        hypsForPar[par] = hyp
+
+    outfile.write(str(hypsForPar))
+    outfile.close()
+
+def readHypsFromDisk():
+    file = open("filnamn", "r")  # <--- change filename
+    jsonData = file.readline()
+    return json.loads(jsonData)
+
 
 def calibration(refkeywords, config, parameter, optkws = None):
 
