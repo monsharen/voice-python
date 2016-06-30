@@ -10,7 +10,7 @@ def calhelper(config, parRange, refs, parameter):
     alignments = []
     for par in parRange:
         print("updating config for par ")
-        config.update({parameter: par, 'kws': 'asd'})
+        config.update({parameter: par})
         hyp = speechanalytics(config)
         alignment = align(refs, [word[0] for word in hyp])
         hyps[str(par)] = hyp
