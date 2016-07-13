@@ -1,4 +1,5 @@
 import wave
+from shutil import copy
 
 def subtitleGeneration(subsFile):
     subsArray = []
@@ -26,15 +27,38 @@ def subtitleGeneration(subsFile):
     return subsArray
 
 def sent2transcription(sent):
-    transcriptionArray = []
+
+    transcriptionHash = {}
+    speakerFreq = {}
+    wordSpeakerFreq = {}
+    sentArray=[]
+
     with open(sent,"r") as f :
         for line in f :
             text, fileid = line.split('(')
-            clean = " ".join([w.strip('.,:;!?"[]-').lower()for w in text.split()])
+            words = [w.strip('.,:;!?"[]-').lower()for w in text.split()]
+            clean = " ".join(words)
             clean = clean.strip()
             fileid = fileid.split(")")[0]
-            transcriptionArray.append([fileid,clean])
-    return transcriptionArray
+            speaker, transcriptId = fileid.split('_')
+
+            for word in words:
+                if wordSpeakerFreq.get(word) != None:
+                    wordSpeakerFreq[word].add(speaker)
+                else:
+                    wordSpeakerFreq[word]=set()
+                    wordSpeakerFreq[word].add(speaker)
+
+            sentArray.append([fileid,clean])
+            if transcriptionHash.get(speaker) is not None:
+                transcriptionHash[speaker].append([fileid,clean])
+                speakerFreq[speaker].append([w for w in clean.split(" ")])
+            else:
+                transcriptionHash[speaker]=[[fileid,clean]]
+                speakerFreq[speaker]=[[w for w in clean.split(" ")]]
+
+    wordSpeakerFreq = {word:len(wordSpeakerFreq[word]) for word in wordSpeakerFreq.keys()}
+    return [transcriptionHash,sentArray,wordSpeakerFreq]
 
 def concatenateAudioFiles(fileArray,testFolder, outputFile):
 
@@ -51,9 +75,6 @@ def concatenateAudioFiles(fileArray,testFolder, outputFile):
         frameRate = origAudio.getframerate()
         nChannels = origAudio.getnchannels()
         sampWidth = origAudio.getsampwidth()
-        print(frameRate)
-        print(nChannels)
-        print(sampWidth)
         frames = origAudio.getnframes()
         data = origAudio.readframes(frames)
         outputFile.writeframesraw(data)
@@ -86,3 +107,17 @@ def generateTrainingTranscription(transcriptionFile, text, fileid):
 def generateFileIds(fileidsFile, fileid):
     fileidsFile.write(fileid + "\n")
 
+def kwsReferenceFile(transcriptionfile,kwshash,referenceOutputFile):
+    output = open(referenceOutputFile,"w")
+    print(kwshash)
+    with open(transcriptionfile, 'r') as f:
+        for line in f:
+            linekws = []
+            text, fileId = line.split('(')
+            for word in text.split(" "):
+                word = word.strip('.,:;!?"[]-').lower()
+                if kwshash.get(word) != None:
+                    linekws.append(word.strip())
+                    print(linekws)
+            output.write(" ".join(w for w in linekws) + "(" + fileId)
+    output.close()
