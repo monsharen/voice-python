@@ -4,7 +4,6 @@ from Modules.training.trainingFilesUtil import *
 from Modules.training.trainTestSplitt import *
 from Modules.keywordExtraction import extraction, randomSampling, reference
 
-
 if __name__ == "__main__":
 
     root = os.path.realpath('../../..')  # sys.path[0]
