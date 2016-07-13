@@ -7,9 +7,9 @@ from shutil import copy
 
 if __name__ == "__main__":
 
-    #root = os.path.realpath('../../..')  # sys.path[0]
-    #os.chdir(root)
-    #sys.path.append(root + '\\Modules')
+    root = os.path.realpath('../../..')  # sys.path[0]
+    os.chdir(root)
+    sys.path.append(root + '\\Modules')
 
     #  Trainingset File Preparation config
 

@@ -1,94 +1,36 @@
 __author__ = 'a.ericsson'
-
+from  collections import defaultdict
 from Modules.speechAnalytics.speech import *
 from Modules.wordAlign import *
-import json
+from Modules.util.DiskUtil import *
+
 import numpy as np
-import demjson
 
 
-def scienceToString(number):
+class SpeechAnalyticsWrapper:
 
-    number,exponent = number.split('e')
-    if number > 0 :
-        outputkey = str([0]*number+"."+"0")
-    elif number < 0 :
-        outputkey = 1
-
-
-class PerformanceStats():
-    performanceStats = []
-
-    def __init__(self):
-        self.performanceStats=
-
-    def update(self,par):
-        self.performanceStats
-
-    def calculate(self,alignment,par):
-
-    def get_Stats(self):
-        return self.performanceStats()
-
-
-
-class TestClass():
-
-    def __init__(self,refs,hyps,parameter=None,parameterRange=None):
-        self.refs = refs,
-        self.hyps = hyps
-        self.parameter = parameter
-        self.parameterRange = parameterRange
-        if parameterRange != None
-
-        else:
-            self.performanceStats = {word:{'TP':0,'FP':0 ,'FN':0,'WER':0,'freq':refs.count(word)} for word in refs for par in parameterRange}
-
-    def parameterOptimization(self,config,parameterRange,parameter):
-        hypsForPar={}
+    def parameterOptimization(self, config, parameterRange, parameter):
+        hypsForPar = {}
         for par in parameterRange:
             print("updating config for par")
-            config.update({parameter:par})
+            config.update({parameter: par})
             hyp = speechanalytics(config)
-            hypsForPar[str(par)]= hyp
+            hypsForPar[str(par)] = hyp
 
         return hypsForPar
 
-    def performanceStatsCalculation(self,refs,hyps):
 
-        alignment = align(refs,hyps)
+class ParameterOptimizationStatistics:
+    hypsForPar = ''
 
-        for (ref, hyp) in alignment['alignment']:
-            if ref != hyp:
-                if ref == '-':
-                    w = self.performanceStats.get(hyp.lower())
-                    if w is not None:
-                        self.performanceStats[hyp.lower()]['FP'] += 1
-                elif hyp == '-':
-                    self.performanceStats[ref.lower()]['FN'] += 1
-                else:
-                    w = self.performanceStats.get(hyp.lower())
-                    if w is not None:
-                        self.performanceStats[hyp.lower()]['FP'] += 1
-                    w = self.performanceStats.get(ref.lower())
-                    if w is not None:
-                        self.performanceStats[ref.lower()]['FN'] += 1
-            elif ref == hyp:
-                self.performanceStats[ref.lower()]['TP'] +=1
+    def __init__(self, hypsForPar):
+        self.hypsForPar = hypsForPar
 
-    def performanceEvaluation(self, refs,hyps):
-        performanceStatsOog = {}
-        for par in self.parameterRange:
-            hyp = hyps[str(par)]
-            performanceStats = wordStats(refs,hyp)
+    def getPerformanceStatistics(self, refs):
+        performanceStats = {word: {str(par): {'TP': 0, 'FP': 0, 'FN': 0, 'WER': 0, 'freq': refs.count(word)} for par in self.hypsForPar.keys()} for word in refs}
 
-        return performanceStats
-
-
-    def performanceEvaluation(self, refs,hyps):
-
-        for par in hyps['parameterRange']:
-            hyp = hyps[str(par)]
+        for par in self.hypsForPar.keys():
+            hyp = self.hypsForPar[str(par)]
             alignment = align(refs, [word[0] for word in hyp])
 
             for (ref, hyp) in alignment['alignment']:
@@ -96,24 +38,23 @@ class TestClass():
                     if ref == '-':
                         w = performanceStats.get(hyp.lower())
                         if w is not None:
-                            performanceStats[hyp.lower()][par]['FP'] +=1
+                            performanceStats[hyp.lower()][str(par)]['FP'] +=1
                     elif hyp == '-':
-                        performanceStats[ref.lower()][par]['FN'] +=1
+                        performanceStats[ref.lower()][str(par)]['FN'] +=1
                     else:
                         w = performanceStats.get(hyp.lower())
                         if w is not None:
-                            performanceStats[hyp.lower()][par]['FP'] +=1
+                            performanceStats[hyp.lower()][str(par)]['FP'] +=1
                         w = performanceStats.get(ref.lower())
                         if w is not None:
-                            performanceStats[ref.lower()][par]['FN'] +=1
+                            performanceStats[ref.lower()][str(par)]['FN'] +=1
                 elif ref == hyp:
-                    performanceStats[ref.lower()][par]['TP'] +=1
+                    performanceStats[ref.lower()][str(par)]['TP'] +=1
 
         return performanceStats
 
-    def bestPar(self, performanceStats,parameterRange,optkws):
+    def getBestParForWords(self, performanceStats, parameterRange):
         bestParWord = {}
-        outfile = open(optkws,"w")
         for word in performanceStats.keys():
             bestWer = None
             bestPar = len(performanceStats)
@@ -130,25 +71,28 @@ class TestClass():
                     bestWer = wer
                     bestPar = par
 
-                print("word: " + str(word) + " " + "wer: " + str(wer) + " " +  "bestWer: " + str(bestWer) +" " + "bestPar: " + str(bestPar))
+                print("word: " + str(word) + " wer: " + str(wer) + " bestWer: " + str(bestWer) +" bestPar: " + str(bestPar))
 
             bestParWord[word]=bestPar
-            outfile.write(word + "/" + str(bestPar) + "/\n" )
 
         return bestParWord
 
-def saveHypsToDisk(config, parameterRange, parameter):
-    outfile = open("C:/Users/a.ericsson/PycharmProjects/SpeechAnalytics/Voice_Python/Datasets/PDAm1/MetaData/serialhyps1.txt", "w")   # <--- change filename
-    hypsForPar = parameterOptimization(config,parameterRange,parameter)
-    outfile.write(str(hypsForPar))
-    outfile.close()
+    def writeStatisticsToFile(self, bestParWord, fileName):
+        lines = ""
+        for word in bestParWord.keys():
+            bestPar = bestParWord[word]
+            lines += word + "/" + str(bestPar) + "/\n"
+        saveToDisk(fileName, lines)
 
-def readHypsFromDisk():
-    file = open("C:/Users/a.ericsson/PycharmProjects/SpeechAnalytics/Voice_Python/Datasets/PDAm1/MetaData/serialhyps1.txt", "r")  # <--- change filename
-    jsonData = file.readline()
-    return demjson.decode(jsonData)
 
-def calibration(refkeywords, config, parameter, optkws = None):
+def OogCalibaration(refs, hyps, outputFile):
+    stats = ParameterOptimizationStatistics(hyps)
+    performanceStats = stats.getPerformanceStatistics(refs)
+    bestOog = stats.getBestParForWords(performanceStats, hyps.keys())
+    stats.writeStatisticsToFile(bestOog, outputFile)
+    return [performanceStats, bestOog]
+
+def calibration(refkeywords, parameter, outputFile):
 
     infile = open(refkeywords, "r")
     refs = [word for word in " ".join(infile.readlines()).split()]
@@ -169,16 +113,14 @@ def calibration(refkeywords, config, parameter, optkws = None):
         parRange = np.logspace(-30,-5,6)
 
     elif parameter == "oog":
-        #parameterRange = np.logspace(-10,50,7)
-        #hyps = saveHypsToDisk(config, parameterRange, parameter)
-        hyps = readHypsFromDisk()
-        performanceStats= performanceEvaluation(refs, hyps)
-        bestOog = bestPar(performanceStats,hyps['parameterRange'],optkws)
+        hyps = readJsonFromDisk("C:/Users/monsharen/Dropbox/projects/voice-python/Datasets/PDAm1/MetaData/serialhyps1.txt")
+        performanceStats, bestOog = OogCalibaration(refs, hyps, outputFile)
 
-        return [performanceStats,bestOog]
+        return bestOog
 
-    alignments, hyps = calhelper(config, parRange, refs, parameter)
-    return [alignments, hyps]
+    # alignments, hyps = calhelper(config, parRange, refs, parameter)
+    # return [alignments, hyps]
+    return []
 
 def compare (refs,hyp):
     """

@@ -28,7 +28,6 @@ if __name__ == "__main__":
     print(dataSet.print())
 
     print("Reading keywords...")
-    kws = open(dataSet.metaData.optkwsFile, 'r')
     #kws = open(dataSet.metaData.kwsFile, 'r')
     #keywords = [ word for word in " ".join(kws.readlines()).split() ]
     #print(keywords)
@@ -40,7 +39,7 @@ if __name__ == "__main__":
     #print(referenceArray)
 
     #config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.optkwsFile)
-    config = Config(acousticModel=model.acousticModel,languagedictionary=model.dictionaryFile,kwsfile=dataSet.metaData.kwsFile,audiofile=dataSet.testSet.audioInputFile)
+    config = Config(acousticModel=model.acousticModel,languagedictionary=model.dictionaryFile,kwsfile=dataSet.metaData.optkwsFile,audiofile=dataSet.testSet.audioInputFile)
     #config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.kwsFile)
     #config.update({"oog":1e+3, "kws":"test"})
     config.update({"kws":"test"})

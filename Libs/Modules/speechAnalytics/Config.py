@@ -10,15 +10,14 @@ class Config:
     fileids = ''
     cepdir = ''
 
-    def __init__(self, acousticModel=acousticModel, languagedictionary=languageDictionary, audiofile=audioFile, kwsfile=kwsfile, fileids=fileids,cepdir=cepdir):
-
+    def __init__(self, acousticModel=acousticModel, languagedictionary=languageDictionary, audiofile=audioFile, kwsfile=kwsfile):
         self.acousticModel = acousticModel
         self.languageDictionary = languagedictionary
         self.audioFile = audiofile
         self.config = Decoder.default_config()
         self.kwsfile = kwsfile
         #self.config.set_string('-logfn','nul')
-        self.config.set_string('-kws_plp',str(1e-1))
+        # self.config.set_string('-kws_plp', str(1e-1))
 
     def update(self, typeParams):
 

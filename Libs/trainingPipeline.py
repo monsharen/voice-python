@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
 
     #modelName = "cmusphinx-en-us-5.2"
-    modelName = "cmusphinx-en-us-ptm-5.2_Adapt_PDAm1"
+    modelName = "cmusphinx-en-us-ptm-5.2"
     model = get_model(modelName)
 
     #   Output
@@ -31,11 +31,22 @@ if __name__ == "__main__":
     dataSet.print()
 
     print("Training Model...")
-    #trainer.run(root, modelName, model.folder, sampleRate=sampleRate, trainingSet="PDAm1")
+    # trainer.run(root, modelName, model.folder, sampleRate=sampleRate, trainingSet="PDAm1")
 
     print("Processing calibration...")
     config = Config(model.acousticModel, model.dictionaryFile, dataSet.testSet.audioInputFile, dataSet.metaData.kwsFile)
-    #alignments, hyps = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
-    accuracyWord,bestOogForWord = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
+
+    wrapper = SpeechAnalyticsWrapper()
+    parameterRange = np.logspace(-20, 50, 8)
+    hypsforpar = wrapper.parameterOptimization(config, parameterRange=parameterRange, parameter='oog')
+    saveToDisk("C:/Users/monsharen/Dropbox/projects/voice-python/Datasets/PDAm1/MetaData/serialhyps1.txt", hypsforpar)
+    # alignments, hyps = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
+    calibration(refkeywords=dataSet.metaData.referenceFile, outputFile=dataSet.metaData.optkwsFile, parameter='oog')
+
+    #refs = open(dataSet.metaData.referenceFile, "r")
+    #hyps = readJsonFromDisk("C:/Users/monsharen/Dropbox/projects/voice-python/Datasets/PDAm1/MetaData/serialhyps1.txt")
+
+    # performanceStats, bestOogForWord = OogCalibaration(refs, hyps)
+
     print("Process took %s seconds" % (time.time() - processStartedTime))
 
