@@ -17,6 +17,8 @@ if __name__ == "__main__":
     modelName = "cmusphinx-en-us-ptm-5.2"
     model = get_model(modelName)
 
+    result = get_result(dataSet, model)
+
     #   Output
     outputFolder = root + "\\Output\\"
 
@@ -39,9 +41,9 @@ if __name__ == "__main__":
     wrapper = SpeechAnalyticsWrapper()
     parameterRange = np.logspace(-20, 50, 8)
     hypsforpar = wrapper.parameterOptimization(config, parameterRange=parameterRange, parameter='oog')
-    saveToDisk("C:/Users/monsharen/Dropbox/projects/voice-python/Datasets/PDAm1/MetaData/serialhyps1.txt", hypsforpar)
+    saveToDisk(result.serialHypsFile, hypsforpar)
     # alignments, hyps = calibration(refkeywords=dataSet.metaData.referenceFile, config=config, parameter='oog', optkws=dataSet.metaData.optkwsFile)
-    calibration(refkeywords=dataSet.metaData.referenceFile, outputFile=dataSet.metaData.optkwsFile, parameter='oog')
+    calibration(refkeywords=dataSet.metaData.referenceFile, outputFile=dataSet.metaData.optkwsFile, parameter='oog', result=result)
 
     #refs = open(dataSet.metaData.referenceFile, "r")
     #hyps = readJsonFromDisk("C:/Users/monsharen/Dropbox/projects/voice-python/Datasets/PDAm1/MetaData/serialhyps1.txt")

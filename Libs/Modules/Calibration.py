@@ -92,7 +92,7 @@ def OogCalibaration(refs, hyps, outputFile):
     stats.writeStatisticsToFile(bestOog, outputFile)
     return [performanceStats, bestOog]
 
-def calibration(refkeywords, parameter, outputFile):
+def calibration(refkeywords, parameter, outputFile, result):
 
     infile = open(refkeywords, "r")
     refs = [word for word in " ".join(infile.readlines()).split()]
@@ -113,7 +113,8 @@ def calibration(refkeywords, parameter, outputFile):
         parRange = np.logspace(-30,-5,6)
 
     elif parameter == "oog":
-        hyps = readJsonFromDisk("C:/Users/monsharen/Dropbox/projects/voice-python/Datasets/PDAm1/MetaData/serialhyps1.txt")
+
+        hyps = readJsonFromDisk(result.serialHypsFile)
         performanceStats, bestOog = OogCalibaration(refs, hyps, outputFile)
 
         return bestOog
@@ -134,30 +135,38 @@ def compare (refs,hyp):
 def compare_transcription(refsFile,hypsFile):
     refs = open(refsFile,"r")
     hyps = open(hypsFile,"r")
-    refsArray = []
-    hypsArray = []
+    refsHash = {}
+    hypsHash = {}
     results = {'alignments':[],'total':{'Ins':[],'Del':[],'Subs':[],'totalC':0}}
     totalRefs= 0
+
 
     for line in refs.readlines():
         text, fileId = line.split('(')
         words = [w for w in text.split(" ")]
-        fileId=fileId.strip()
-        refsArray.append( [fileId.rstrip(')'),words])
-        totalRefs+=len(words)
+        fileId = fileId.strip()
+        refsHash[fileId.rstrip(')')] = words
+        totalRefs += len(words)
         print(totalRefs)
     results['total']['totalC']=totalRefs
 
     for line in hyps.readlines():
         text, fileId = line.split('(')
-        words = [w for w in text.split(" ")]
-        fileId=fileId.strip()
-        hypsArray.append( [fileId.rstrip(')'),words])
+        text = text.strip()
+        print("'" + text + "'")
+        words = []
+        if len(text) != 0:
+            words = [w for w in text.split(" ")]
+        fixedFileId = fileId.split(" ")[0].strip()
+        hypsHash[fixedFileId] = words
 
-    for index in range(0,len(hypsArray)):
-        print(refsArray[index])
-        result = align(refsArray[index][1],hypsArray[index][1])
-        results['alignments'].append([hypsArray[0],result['Ins'],result['Del'],result['Subs']])
+    print(hypsHash)
+
+    for fileId in refsHash.keys():
+        # print(refsArray[index])
+        print(hypsHash[fileId])
+        result = align(refsHash[fileId],hypsHash[fileId])
+        results['alignments'].append([fileId,hypsHash[fileId], result['Ins'], result['Del'], result['Subs']])
         results['total']['Ins'].append(result['Ins'])
         results['total']['Del'].append(result['Del'])
         results['total']['Subs'].append(result['Subs'])

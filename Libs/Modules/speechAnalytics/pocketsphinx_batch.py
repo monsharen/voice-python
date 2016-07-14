@@ -12,15 +12,16 @@ class pocketsphinx_batch():
     kwsfile = ''
     acousticModel = ''
     dictionary = ''
+    result = None
 
-    def __init__(self,rootDirectory,filedirectory,fileids,kwsfile,acousticModel,dictionary,results):
-        self.filedirectory = filedirectory
-        self.fileids = fileids
-        self.kwsfile = kwsfile
-        self.acousticModel = acousticModel
-        self.dictionary = dictionary
+    def __init__(self,rootDirectory, dataSet, model, result):
+        self.filedirectory = dataSet.trainingSet.folder
+        self.fileids = dataSet.trainingSet.fileIdsFile
+        self.kwsfile = dataSet.metaData.optkwsFile
+        self.acousticModel = model.acousticModel
+        self.dictionary = model.dictionaryFile
+        self.result = result
         self.sphinxBinPath = rootDirectory + "\\SphinxTrain\\bin\\Release\\x64"
-        self.results = results
 
     def applyconfig(self):
         return [self.sphinxBinPath + "\\pocketsphinx_batch",
@@ -31,12 +32,20 @@ class pocketsphinx_batch():
                 "-kws", self.kwsfile,
                 "-hmm", self.acousticModel,
                 "-dict", self.dictionary,
-                "-hyp", self.results,
-                #"-kws_plp",str(1e-3),
-                "-kws_threshold",str(100),
+                "-hyp", self.result.serialHypsFile,
+                #"-kws_plp", str(1e+5),
+                #"-kws_threshold", str(10000),
+                #"-verbose", "true",
+                #"-pbeam", "1e-48",
+                #"-pl_beam", "1e-100",
+                #"-pl_pbeam", "1e-100",
+                #"-pl_pip", "100.0"
                 #"-kws_delay",
                 #"-mllr", self.acousticModel + "\\mllr_matrix"
                 ]
 
     def run(self):
-        call(self.applyconfig())
+        command = self.applyconfig()
+        print("command")
+        print(command)
+        call(command)

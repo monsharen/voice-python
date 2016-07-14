@@ -15,18 +15,19 @@ if __name__ == "__main__":
 
     processStartedTime = time.time()
 
-    root = os.path.realpath('..')  # sys.path[0]
+    root = os.path.realpath('.')  # sys.path[0]
     os.chdir(root)
     sys.path.append(root + '\\Modules')
     libsFolder = os.path.realpath('.')
 
     #   Input
     dataSet = get_data_set("PDAm1")
-    model = get_model("cmusphinx-en-us-ptm-5.2_Adapt_PDAm1")
-    result = Result("PDAm1","Run.1")
+    model = get_model("cmusphinx-en-us-ptm-5.2")
+    result = get_result(dataSet, model)
     print("Executing pipeline")
     print(model.print())
     print(dataSet.print())
+    print(result.print())
 
     print("Reading keywords...")
     kws = open(dataSet.metaData.kwsFile, 'r')
@@ -34,14 +35,16 @@ if __name__ == "__main__":
     print("Reading reference file...")
     referenceFile = open(dataSet.metaData.kwsReferenceFile, 'r')
     referenceArray = [word for word in " ".join(referenceFile.readlines()).split()]
-    print(result.result)
     print("Processing speech analytics...")
-    pocketbatch = pocketsphinx_batch(root,dataSet.trainingSet.folder,dataSet.trainingSet.fileIdsFile,dataSet.metaData.optkwsFile,model.acousticModel,model.dictionaryFile,result.result)
+    #pocketbatch = pocketsphinx_batch(root,dataSet.trainingSet.folder,dataSet.trainingSet.fileIdsFile,dataSet.metaData.optkwsFile,model.acousticModel,model.dictionaryFile)
+    pocketbatch = pocketsphinx_batch(root, dataSet, model, result)
     pocketbatch.applyconfig()
     pocketbatch.run()
 
     print("Comparing alignment to reference")
-    results = compare_transcription(dataSet.metaData.kwsReferenceFile,result.result)
+    results = compare_transcription(dataSet.metaData.kwsReferenceFile, result.serialHypsFile)
+    print("=== result ===")
+    print(results)
     ins,dels,subs = [sum(results['total']['Ins']), sum(results['total']['Del']),sum(results['total']['Subs'])]
     print("Insertions :" + str(ins))
     print("Deletions :" + str(dels))

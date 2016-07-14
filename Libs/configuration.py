@@ -3,6 +3,7 @@ import sys
 sys.path.insert(0, os.path.abspath('..'))
 
 import Modules
+from time import strftime
 
 root = os.path.realpath('..')  # sys.path[0]
 os.chdir(root)
@@ -37,20 +38,26 @@ def get_model(modelFolderName):
     _dictionaryFile = _modelFolder + "\\cmudict-en-us.dict"
     _acousticModel = _modelFolder + "\\" + modelFolderName
     model = Model()
+    model.modelFolderName = modelFolderName
     model.folder = _modelFolder
     model.dictionaryFile = _dictionaryFile
     model.acousticModel = _acousticModel
     return model
 
-def get_result(dataSet,name):
 
-    _result = _resultFolder + "result.txt"
-    Result.name=_name
-    Result.configurationFolder=_configurationFolder
-    Result.resultFolder=_resultFolder
-    Result.result=_result
+def get_result(dataSet, model):
+    _resultFolder = root + "\\Result\\" + dataSet.name + "_" + model.modelFolderName # + "__" + strftime("%Y-%m-%d_%H%M%S")
+    result = Result()
+    result.dataSet = dataSet
+    result.model = model
+    result.resultFolder = _resultFolder
+    result.configurationOutputFile = _resultFolder + "\\configuration.txt"
+    result.serialHypsFile = _resultFolder + "\\serialhyps.txt"
+    return result
+
 
 class Model():
+    modelFolderName = ""
     folder = ""
     dictionaryFile = ""
     acousticModel = ""
@@ -59,6 +66,7 @@ class Model():
         print("folder: " + self.folder)
         print("dictionaryFile: " + self.dictionaryFile)
         print("acousticModel: " + self.acousticModel)
+        print("modelFolderName: " + self.modelFolderName)
 
 
 class MetaData:
@@ -112,27 +120,17 @@ class DataSet:
         self.metaData.print()
         self.trainingSet.print()
 
-class Result():
-    dataSet=""
-    name=""
-    configurationFolder = ""
+class Result:
+    model = None
+    dataSet = None
+    configurationOutputFile = ""
     resultFolder = ""
-    result = ""
+    serialHypsFile = ""
 
-    def __init__(self,dataSet,name):
-        _dataSet=root + "\\Results\\" + dataSet
-        _name = root  +"\\Results\\" + dataSet + "\\" + name
-        _resultFolder = _name + "\\result\\"
-        _configurationFolder = _name + "\\configurationFolder"
-        _result= _resultFolder + "results.txt"
-
-        self.name = _name
-        self.configurationFolder = _configurationFolder
-        self.resultFolder = _resultFolder
-        self.result = _result
 
     def print(self):
-        print("Name: " + self.name)
-        print("configurationFolder: " + self.configurationFolder)
-        print("Result: " + self.resultFolder)
+        print("Result")
+        print("configurationFile: " + self.configurationOutputFile)
+        print("resultFolder: " + self.resultFolder)
+        print("serialHyps: " + self.serialHypsFile)
 
